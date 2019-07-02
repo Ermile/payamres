@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/Layout_ActivityMain"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#202021"
+    tools:context=".MainActivity">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/Refresh_json"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_alignParentTop="true"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:padding="3dp"
+                    android:background="#14000000"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <CheckBox
+                            android:id="@+id/status_CheckBox"
+                            android:layout_marginRight="10dp"
+                            android:checked="false"
+                            android:buttonTint="#fff"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp" />
+
+                        <TextView
+                            android:id="@+id/tv_numberphone"
+                            android:gravity="center|right"
+                            android:layout_marginRight="10dp"
+                            android:textColor="#fff"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"/>
+
+                        <TextView
+                            android:gravity="center|right"
+                            android:layout_marginRight="10dp"
+                            android:textColor="#fff"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="11.0.0"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"/>
+
+
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Status"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp" />
+                        <TextView
+                            android:gravity="center|left"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp" />
+                        <TextView
+                            android:gravity="center|left"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Version"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp">
+
+
+                    <LinearLayout
+                        android:layout_marginLeft="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Today Send"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_todayS"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginRight="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Today Received"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_todayR"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp">
+
+
+                    <LinearLayout
+                        android:layout_marginLeft="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Week Send"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_weekS"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginRight="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Week Received"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_weekR"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp">
+
+
+                    <LinearLayout
+                        android:layout_marginLeft="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Month Send"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_monthS"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginRight="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="Month Received"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_monthR"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp">
+
+
+                    <LinearLayout
+                        android:layout_marginLeft="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="All Send"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_allS"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginRight="3dp"
+                        android:background="#14000000"
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:gravity="center|left"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#777"
+                            android:textSize="12sp"
+                            android:padding="5dp"
+                            android:text="All Received"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_allR"
+                            android:gravity="center|left"
+                            android:layout_marginTop="-20dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginRight="7dp"
+                            android:layout_marginLeft="7dp"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:padding="5dp"
+                            android:text=""
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+
+
+
+
+            </LinearLayout>
+
+
+
+        </ScrollView>
+
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_gravity="center"
+            android:id="@+id/GIFs"
+            android:src="@drawable/porogress"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.49"/>
+
+    </LinearLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</RelativeLayout>
