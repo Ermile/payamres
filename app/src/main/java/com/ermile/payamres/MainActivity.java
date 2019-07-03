@@ -94,15 +94,15 @@ public class MainActivity extends AppCompatActivity {
 
         /*First Open app*/
         if (first_open && has_number){
-            /*Start Services*/
-            startService();
             SaveUser_editor.putBoolean("first_open",false);
             SaveUser_editor.apply();
         }
-
-
         if (!has_number || number_phone == null){
             SAVE_NUMBER();
+        }
+        if (has_number){
+            /*Start Services*/
+            startService();
         }
 
 
