@@ -1,133 +1,112 @@
 package com.ermile.payamres;
 
-
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.ermile.payamres.network.AppContoroler;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
-public class service extends Service {
-
+public class ForegroundService extends Service {
     String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
     String link_LastSMS = "https://khadije.com/api/v6/smsapp/notsent";
     String link_newSMS = "https://khadije.com/api/v6/smsapp/queue";
     String link_smsIsSent = "https://khadije.com/api/v6/smsapp/sent";
     String id_smsForSend = null;
 
-    Timer timer;
-    TimerTask timerTask;
-    String TAG = "ForegroundService" ;
-    int Your_X_SECS = 30;
+    public static final String CHANNEL_ID = "ForegroundServiceChannel";
+    private static String TAG = "ForegroundService";
 
+    boolean powerServic = false;
+    Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "run LastSMSSending ,"+" power Service is : "+powerServic);
+            if (powerServic){
+                LastSMSSending(getBaseContext());
+                handler.postDelayed(runnable, 10000); //100 ms you should do it 4000
+            }
+        }
+    };
 
     @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
+    public void onCreate() {
+        super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG , "onStartCommand");
-        super.onStartCommand(intent, flags, startId);
 
-        startTimer();
+        String input = intent.getStringExtra("inputExtra");
+        createNotificationChannel();
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, notificationIntent, 0);
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Payamres is Running..")
+                .setContentText("Send: 10")
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentIntent(pendingIntent)
+                .build();
+        startForeground(1, notification);
 
-        return START_STICKY;
-    }
-
-
-    @Override
-    public void onCreate() {
-        Log.i(TAG , "onCreate");
-
-
+        if (!powerServic){
+            powerServic = true;
+            handler.postDelayed(runnable, 0);
+            Log.d(TAG, "handler.postDelayed "+" --> "+powerServic);
+        }
+        return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        Log.e(TAG , "onDestroy");
         super.onDestroy();
-
-        /*Shared Preferences for info user*/
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final Boolean getSMS_servic = save_user.getBoolean("getSMS_servic", false);
-        SaveUser_editor.putBoolean("getSMS_servic",false);
-        SaveUser_editor.apply();
-
-        stoptimertask();
+        powerServic = false;
+        handler.removeCallbacks(runnable);
+        Log.e(TAG,"onDestroy"+" --> "+powerServic);
     }
 
-    //we are going to use a handler to be able to run in our TimerTask
-    final Handler handler = new Handler();
-
-
-    public void startTimer() {
-        //set a new Timer
-        timer = new Timer();
-
-        //initialize the TimerTask's job
-        initializeTimerTask();
-
-        Log.i(TAG ,"startTimer 1");
-        //schedule the timer, after the first 5000ms the TimerTask will run every 10000ms
-        timer.schedule(timerTask, 5000, Your_X_SECS * 1000); //
-        //timer.schedule(timerTask, 5000,1000); //
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-    public void stoptimertask() {
-        //stop the timer, if it's not already null
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Foreground Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+            Log.i(TAG,"createNotificationChannel");
         }
-    }
-
-    public void initializeTimerTask() {
-        /*Shared Preferences for info user*/
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final Boolean getSMS_servic = save_user.getBoolean("getSMS_servic", false);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-
-        timerTask = new TimerTask() {
-            public void run() {
-                Log.i(TAG ,"timerTask");
-                SaveUser_editor.putBoolean("getSMS_servic",true);
-                SaveUser_editor.apply();
-                if(getSMS_servic)
-                {
-                    //use a handler to run a toast that shows the current timestamp
-                    handler.post(new Runnable() {
-                        public void run() {
-                            //TODO CALL NOTIFICATION FUNC
-                            if (has_number && number_phone != null) {
-                                LastSMSSending(getBaseContext());
-                                Log.i(TAG ,"NEW");
-                            }
-                        }
-                    });
-                }
-            }
-        };
     }
 
     /*Last SMS for Sending*/
@@ -323,7 +302,4 @@ public class service extends Service {
         }
 
     }
-
-
-
 }

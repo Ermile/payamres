@@ -78,27 +78,11 @@ public class MainActivity extends AppCompatActivity {
     String noNull = null;
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        /*Get Number Phone */
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final Boolean getSMS_servic = save_user.getBoolean("getSMS_servic", false);
-        if (!getSMS_servic){
-            startService(new Intent(this, service.class));
-            SaveUser_editor.putBoolean("getSMS_servic",true);
-            SaveUser_editor.apply();
-            Log.i(TAG, "Destroyd : " + getSMS_servic);
-        }
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LastSMSSending(this);
-
+        /*Start Services*/
+        startService();
 
 
         /*Get save_user*/
@@ -112,24 +96,10 @@ public class MainActivity extends AppCompatActivity {
 
         /*First Open app*/
         if (first_open && has_number){
-            send_testSMS();
             SaveUser_editor.putBoolean("first_open",false);
             SaveUser_editor.apply();
         }
 
-        SaveUser_editor.putBoolean("getSMS_servic",false);
-        SaveUser_editor.apply();
-        stopService(new Intent(getApplicationContext(),service.class));
-        Log.d(TAG, "servic stoped");
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startService(new Intent(getApplicationContext(), service.class));
-                SaveUser_editor.putBoolean("getSMS_servic",true);
-                SaveUser_editor.apply();
-                Log.d(TAG, "Refresh : " + getSMS_servic);
-            }
-        }, 500);
 
         if (!has_number || number_phone == null){
             SAVE_NUMBER();
@@ -419,194 +389,17 @@ public class MainActivity extends AppCompatActivity {
         };AppContoroler.getInstance().addToRequestQueue(post_user_add);
     }
 
-    /*Last SMS for Sending*/
-    public void LastSMSSending(final Context context_LastSMSSending){
-        /*Get Number Phone */
-        final SharedPreferences save_user = context_LastSMSSending.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-        if (has_number && number_phone != null){
-            StringRequest post_LastSMSSending = new StringRequest(Request.Method.POST, link_LastSMS,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject mainObject = new JSONObject(response);
-                                /*if sending from database is ok > Delete data from database*/
-                                Boolean ok_dashboard = mainObject.getBoolean("ok");
-                                if (ok_dashboard) {
-                                    if (!mainObject.isNull("result")){
-                                        JSONArray result = mainObject.getJSONArray("result");
-                                        for (int newM = 0; newM <= result.length(); newM++) {
-                                            JSONObject getsms_Forsend = result.getJSONObject(newM);
-                                            id_smsForSend = getsms_Forsend.getString("id");
-                                            String smsto = getsms_Forsend.getString("fromnumber");
-                                            String sms_text = getsms_Forsend.getString("answertext");
 
-                                            try {
-                                                SmsManager smsManager = SmsManager.getDefault();
-                                                smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                Log.i(TAG, "last sms > ok true > send sms");
-                                                SMS_Sent(context_LastSMSSending);
-                                            } catch (Exception e) {
-                                                Log.i(TAG,"No Send last sms"+"\n"+smsto+"\n"+sms_text);
-                                            }
+    public void startService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        serviceIntent.putExtra("inputExtra", "Foreground Service Example in Android");
 
-                                        }
-                                    }else {
-                                        NewSMSSending(context_LastSMSSending);
-                                        Log.i(TAG, "last sms > no sms for send :) > Check new sms");
-                                    }
-
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.i(TAG, "last sms > error");
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() {
-                    HashMap<String, String> lastsms_headers = new HashMap<>();
-                    lastsms_headers.put("smsappkey", smsappkey);
-                    lastsms_headers.put("gateway", number_phone);
-                    Log.i(TAG, "Send Header");
-                    return lastsms_headers;
-                }
-            };
-            AppContoroler.getInstance().addToRequestQueue(post_LastSMSSending);
-        }
-
+        ContextCompat.startForegroundService(this, serviceIntent);
     }
 
-    /*New SMS for Sending*/
-    public void NewSMSSending(final Context context_NewSMSSending){
-        /*Get Number Phone */
-        final SharedPreferences save_user = context_NewSMSSending.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-        if (has_number && number_phone != null){
-            StringRequest post_NewSMSSending = new StringRequest(Request.Method.POST, link_newSMS,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject mainObject = new JSONObject(response);
-                                /*if sending from database is ok > Delete data from database*/
-                                Boolean ok_dashboard = mainObject.getBoolean("ok");
-                                if (ok_dashboard) {
-                                    if (!mainObject.isNull("result")){
-                                        JSONArray result = mainObject.getJSONArray("result");
-                                        for (int newM = 0; newM <= result.length(); newM++) {
-                                            JSONObject getsms_Forsend = result.getJSONObject(newM);
-                                            id_smsForSend = getsms_Forsend.getString("id");
-                                            String smsto = getsms_Forsend.getString("fromnumber");
-                                            String sms_text = getsms_Forsend.getString("answertext");
-
-                                            try {
-                                                SmsManager smsManager = SmsManager.getDefault();
-                                                smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                Log.i(TAG, "last sms > ok true > send sms");
-                                                SMS_Sent(context_NewSMSSending);
-                                            } catch (Exception e) {
-                                                Log.i(TAG,"No Send");
-                                            }
-                                        }
-                                    }else {
-                                        Log.i(TAG, "new sms > no sms for send :)");
-                                    }
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.i(TAG, "new sms > error");
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() {
-                    HashMap<String, String> newsms_headers = new HashMap<>();
-                    newsms_headers.put("smsappkey", smsappkey);
-                    newsms_headers.put("gateway", number_phone);
-                    Log.i(TAG, "Send Header");
-                    return newsms_headers;
-                }
-            };
-            AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
-        }
-
-    }
-
-    /*SMS Sent*/
-    public void SMS_Sent(Context context_SMS_Sent){
-        /*Get Number Phone */
-        final SharedPreferences save_user = context_SMS_Sent.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-        if (has_number && number_phone != null){
-            StringRequest post_user_add = new StringRequest(Request.Method.POST, link_smsIsSent,
-                    new Response.Listener<String>(){
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject mainObject = new JSONObject(response);
-                                /*if sending from database is ok > Delete data from database*/
-                                Boolean ok_sent = mainObject.getBoolean("ok");
-                                if (ok_sent){
-                                    Log.i(TAG,"SMS Sent | "+id_smsForSend);
-                                }else {
-                                    Log.i(TAG,"SMS NOT Sent | "+id_smsForSend);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.i(TAG, "sms sent > error");
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders()  {
-                    HashMap<String, String> headers = new HashMap<>();
-                    headers.put("smsappkey", smsappkey );
-                    headers.put("gateway", number_phone );
-                    Log.i(TAG, "Send Header");
-                    return headers;
-                }
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> posting = new HashMap<>();
-                    posting.put("smsid", id_smsForSend);
-                    Log.i(TAG,"Send Parametr id | "+id_smsForSend);
-                    return posting;
-                }
-            };AppContoroler.getInstance().addToRequestQueue(post_user_add);
-        }
-
-    }
-
-    public void send_testSMS(){
-        Log.i(TAG, "started");
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres v12.0.0 Installed!", null, null);
-            Log.i(TAG, "sms sent");
-
-        } catch (Exception e) {
-            Log.e(TAG,"send_testSMS no send");
-        }
+    public void stopService() {
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        stopService(serviceIntent);
     }
 
 }

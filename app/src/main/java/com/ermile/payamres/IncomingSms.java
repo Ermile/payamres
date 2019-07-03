@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
@@ -67,15 +68,10 @@ public class IncomingSms extends BroadcastReceiver {
         /*Shared Preferences for info user*/
         final SharedPreferences save_user = context.getSharedPreferences("save_user", MODE_PRIVATE);
         SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final Boolean getSMS_servic = save_user.getBoolean("getSMS_servic", false);
         final Boolean has_number = save_user.getBoolean("has_number", false);
         final String number_phone = save_user.getString("number_phone", null);
-        if (!getSMS_servic){
-            context.startService(new Intent(context, service.class));
-            SaveUser_editor.putBoolean("getSMS_servic",true);
-            SaveUser_editor.apply();
-            Log.i("Timers", "IncomingSms : " + getSMS_servic);
-        }
+        /*Start Services*/
+        startService(context);
 
         /** Receive SMS */
         if (intentExtras != null) {
@@ -278,5 +274,11 @@ public class IncomingSms extends BroadcastReceiver {
 
     }
 
+    public void startService(Context context) {
+        Intent serviceIntent = new Intent(context, ForegroundService.class);
+        serviceIntent.putExtra("inputExtra", "Foreground Service Example in Android");
+
+        ContextCompat.startForegroundService(context, serviceIntent);
+    }
 
 }
