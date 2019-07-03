@@ -12,6 +12,7 @@ public class save_user extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+        Boolean first_open = prefs.getBoolean("first_open",true);
         Boolean getSMS_servic = prefs.getBoolean("getSMS_servic",false);
         Boolean has_number = prefs.getBoolean("has_number",false);
         String number_phone = prefs.getString("number_phone", null);

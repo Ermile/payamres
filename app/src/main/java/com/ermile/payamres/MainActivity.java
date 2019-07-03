@@ -50,6 +50,7 @@ import pl.droidsonroids.gif.GifImageView;
 
 public class MainActivity extends AppCompatActivity {
 
+    String TAG = "MainActivity";
     public String phone_evazzadeh = "+989357269759";
 
     String link_LastSMS = "https://khadije.com/api/v6/smsapp/notsent";
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             startService(new Intent(this, service.class));
             SaveUser_editor.putBoolean("getSMS_servic",true);
             SaveUser_editor.apply();
-            Log.i("Timers", "Destroyd : " + getSMS_servic);
+            Log.i(TAG, "Destroyd : " + getSMS_servic);
         }
 
     }
@@ -98,26 +99,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         LastSMSSending(this);
 
-        send_testSMS();
 
-        /*Get Number Phone */
+
+        /*Get save_user*/
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
         final SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final Boolean getSMS_servic = save_user.getBoolean("getSMS_servic", false);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
+        final boolean first_open = save_user.getBoolean("first_open", true);
+        final boolean getSMS_servic = save_user.getBoolean("getSMS_servic", false);
+        final boolean has_number = save_user.getBoolean("has_number", false);
+        /*Get Number Phone */
         final String number_phone = save_user.getString("number_phone", null);
+
+        /*First Open app*/
+        if (first_open && has_number){
+            send_testSMS();
+            SaveUser_editor.putBoolean("first_open",false);
+            SaveUser_editor.apply();
+        }
 
         SaveUser_editor.putBoolean("getSMS_servic",false);
         SaveUser_editor.apply();
         stopService(new Intent(getApplicationContext(),service.class));
-        Log.d("Timers", "servic stoped");
+        Log.d(TAG, "servic stoped");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 startService(new Intent(getApplicationContext(), service.class));
                 SaveUser_editor.putBoolean("getSMS_servic",true);
                 SaveUser_editor.apply();
-                Log.d("Timers", "Refresh : " + getSMS_servic);
+                Log.d(TAG, "Refresh : " + getSMS_servic);
             }
         }, 500);
 
@@ -193,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                             Manifest.permission.RECEIVE_SMS,
                             Manifest.permission.READ_PHONE_STATE
                     }, 1);
-            Log.i("amin","request-user: permission SMS ");
+            Log.i(TAG,"request-user: permission SMS ");
 
         }
         else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED )
@@ -202,11 +212,11 @@ public class MainActivity extends AppCompatActivity {
                     {
                             Manifest.permission.READ_PHONE_STATE
                     }, 1);
-            Log.i("amin","request-user: permission SMS ");
+            Log.i(TAG,"request-user: permission SMS ");
 
         }
         else{
-            Log.i("amin","permission SMS is true!");
+            Log.i(TAG,"permission SMS is true!");
         }
     }
 
@@ -281,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 SaveUser_editor.putBoolean("has_number",true);
                 SaveUser_editor.putString("number_phone",edt_number.getText().toString());
-                Log.i("amin",""+edt_number.getText().toString());
+                Log.i(TAG,""+edt_number.getText().toString());
                 SaveUser_editor.apply();
                 finish();
                 startActivity(getIntent());
@@ -436,16 +446,16 @@ public class MainActivity extends AppCompatActivity {
                                             try {
                                                 SmsManager smsManager = SmsManager.getDefault();
                                                 smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                Log.i("LastSMSSending", "last sms > ok true > send sms");
+                                                Log.i(TAG, "last sms > ok true > send sms");
                                                 SMS_Sent(context_LastSMSSending);
                                             } catch (Exception e) {
-                                                Log.i("LastSMSSending_error","No Send last sms"+"\n"+smsto+"\n"+sms_text);
+                                                Log.i(TAG,"No Send last sms"+"\n"+smsto+"\n"+sms_text);
                                             }
 
                                         }
                                     }else {
                                         NewSMSSending(context_LastSMSSending);
-                                        Log.i("LastSMSSending", "last sms > no sms for send :) > Check new sms");
+                                        Log.i(TAG, "last sms > no sms for send :) > Check new sms");
                                     }
 
 
@@ -457,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.i("LastSMSSending", "last sms > error");
+                    Log.i(TAG, "last sms > error");
                 }
             }) {
                 @Override
@@ -465,7 +475,7 @@ public class MainActivity extends AppCompatActivity {
                     HashMap<String, String> lastsms_headers = new HashMap<>();
                     lastsms_headers.put("smsappkey", smsappkey);
                     lastsms_headers.put("gateway", number_phone);
-                    Log.i("LastSMSSending", "Send Header");
+                    Log.i(TAG, "Send Header");
                     return lastsms_headers;
                 }
             };
@@ -501,14 +511,14 @@ public class MainActivity extends AppCompatActivity {
                                             try {
                                                 SmsManager smsManager = SmsManager.getDefault();
                                                 smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                Log.i("NewSMSSending", "last sms > ok true > send sms");
+                                                Log.i(TAG, "last sms > ok true > send sms");
                                                 SMS_Sent(context_NewSMSSending);
                                             } catch (Exception e) {
-                                                Log.i("NewSMSSending","No Send");
+                                                Log.i(TAG,"No Send");
                                             }
                                         }
                                     }else {
-                                        Log.i("NewSMSSending", "new sms > no sms for send :)");
+                                        Log.i(TAG, "new sms > no sms for send :)");
                                     }
 
                                 }
@@ -519,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.i("amin", "new sms > error");
+                    Log.i(TAG, "new sms > error");
                 }
             }) {
                 @Override
@@ -527,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
                     HashMap<String, String> newsms_headers = new HashMap<>();
                     newsms_headers.put("smsappkey", smsappkey);
                     newsms_headers.put("gateway", number_phone);
-                    Log.i("NewSMSSending", "Send Header");
+                    Log.i(TAG, "Send Header");
                     return newsms_headers;
                 }
             };
@@ -552,9 +562,9 @@ public class MainActivity extends AppCompatActivity {
                                 /*if sending from database is ok > Delete data from database*/
                                 Boolean ok_sent = mainObject.getBoolean("ok");
                                 if (ok_sent){
-                                    Log.i("SMS_Sent","SMS Sent | "+id_smsForSend);
+                                    Log.i(TAG,"SMS Sent | "+id_smsForSend);
                                 }else {
-                                    Log.i("SMS_Sent","SMS NOT Sent | "+id_smsForSend);
+                                    Log.i(TAG,"SMS NOT Sent | "+id_smsForSend);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -563,7 +573,7 @@ public class MainActivity extends AppCompatActivity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.i("SMS_Sent", "sms sent > error");
+                    Log.i(TAG, "sms sent > error");
                 }
             })
             {
@@ -572,14 +582,14 @@ public class MainActivity extends AppCompatActivity {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("smsappkey", smsappkey );
                     headers.put("gateway", number_phone );
-                    Log.i("SMS_Sent", "Send Header");
+                    Log.i(TAG, "Send Header");
                     return headers;
                 }
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> posting = new HashMap<>();
                     posting.put("smsid", id_smsForSend);
-                    Log.i("SMS_Sent","Send Parametr id | "+id_smsForSend);
+                    Log.i(TAG,"Send Parametr id | "+id_smsForSend);
                     return posting;
                 }
             };AppContoroler.getInstance().addToRequestQueue(post_user_add);
@@ -588,14 +598,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void send_testSMS(){
-        Log.i("send_testSMS", "started");
+        Log.i(TAG, "started");
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone_evazzadeh, null, "Pyamres v11.0.0 Installed!", null, null);
-            Log.i("send_testSMS", "sms sent");
+            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres v12.0.0 Installed!", null, null);
+            Log.i(TAG, "sms sent");
 
         } catch (Exception e) {
-            Log.e("error","send_testSMS no send");
+            Log.e(TAG,"send_testSMS no send");
         }
     }
 

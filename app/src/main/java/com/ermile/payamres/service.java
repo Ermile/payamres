@@ -33,7 +33,7 @@ public class service extends Service {
 
     Timer timer;
     TimerTask timerTask;
-    String TAG = "Timers";
+    String TAG = "ForegroundService" ;
     int Your_X_SECS = 30;
 
 
@@ -44,7 +44,7 @@ public class service extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand");
+        Log.i(TAG , "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
         startTimer();
@@ -55,14 +55,14 @@ public class service extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "onCreate");
+        Log.i(TAG , "onCreate");
 
 
     }
 
     @Override
     public void onDestroy() {
-        Log.e(TAG, "onDestroy");
+        Log.e(TAG , "onDestroy");
         super.onDestroy();
 
         /*Shared Preferences for info user*/
@@ -86,7 +86,7 @@ public class service extends Service {
         //initialize the TimerTask's job
         initializeTimerTask();
 
-        Log.i(TAG,"startTimer 1");
+        Log.i(TAG ,"startTimer 1");
         //schedule the timer, after the first 5000ms the TimerTask will run every 10000ms
         timer.schedule(timerTask, 5000, Your_X_SECS * 1000); //
         //timer.schedule(timerTask, 5000,1000); //
@@ -110,7 +110,7 @@ public class service extends Service {
 
         timerTask = new TimerTask() {
             public void run() {
-                Log.i(TAG,"timerTask");
+                Log.i(TAG ,"timerTask");
                 SaveUser_editor.putBoolean("getSMS_servic",true);
                 SaveUser_editor.apply();
                 if(getSMS_servic)
@@ -121,7 +121,7 @@ public class service extends Service {
                             //TODO CALL NOTIFICATION FUNC
                             if (has_number && number_phone != null) {
                                 LastSMSSending(getBaseContext());
-                                Log.i(TAG,"NEW");
+                                Log.i(TAG ,"NEW");
                             }
                         }
                     });
@@ -159,12 +159,12 @@ public class service extends Service {
                                                 try {
                                                     SmsManager smsManager = SmsManager.getDefault();
                                                     smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                    Log.i("LastSMSSending", "last sms > ok true > send sms");
+                                                    Log.i(TAG , "last sms > ok true > send sms");
                                                     SMS_Sent(id_smsForSend);
-                                                    Log.i("LastSMSSending","id is "+id_smsForSend);
+                                                    Log.i(TAG ,"id is "+id_smsForSend);
 
                                                 } catch (Exception e) {
-                                                    Log.i("LastSMSSending_error","No Send last sms"+"\n"+smsto+"\n"+sms_text);
+                                                    Log.i(TAG ,"No Send last sms"+"\n"+smsto+"\n"+sms_text);
                                                 }
                                             }else {
                                                 id_smsForSend = null;
@@ -175,7 +175,7 @@ public class service extends Service {
                                         }
                                     }else {
                                         NewSMSSending(context_LastSMSSending);
-                                        Log.i("LastSMSSending", "last sms > no sms for send :) > Check new sms");
+                                        Log.i(TAG , "last sms > no sms for send :) > Check new sms");
                                     }
 
 
@@ -187,7 +187,7 @@ public class service extends Service {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.i("LastSMSSending", "last sms > error");
+                    Log.i(TAG , "last sms > error");
                 }
             }) {
                 @Override
@@ -195,7 +195,7 @@ public class service extends Service {
                     HashMap<String, String> lastsms_headers = new HashMap<>();
                     lastsms_headers.put("smsappkey", smsappkey);
                     lastsms_headers.put("gateway", number_phone);
-                    Log.i("LastSMSSending", "Send Header");
+                    Log.i(TAG , "Send Header");
                     return lastsms_headers;
                 }
             };
@@ -235,17 +235,17 @@ public class service extends Service {
                                                 try {
                                                     SmsManager smsManager = SmsManager.getDefault();
                                                     smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                    Log.i("NewSMSSending", "last sms > ok true > send sms");
+                                                    Log.i(TAG , "last sms > ok true > send sms");
                                                     SMS_Sent(id_smsForSend);
-                                                    Log.i("NewSMSSending","id is "+id_smsForSend);
+                                                    Log.i(TAG ,"id is "+id_smsForSend);
 
                                                 } catch (Exception e) {
-                                                    Log.i("NewSMSSending","No Send");
+                                                    Log.i(TAG ,"No Send");
                                                 }
                                             }
                                         }
                                     }else {
-                                        Log.i("NewSMSSending", "new sms > no sms for send :)");
+                                        Log.i(TAG , "new sms > no sms for send :)");
                                     }
 
                                 }
@@ -256,7 +256,7 @@ public class service extends Service {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.i("amin", "new sms > error");
+                    Log.i(TAG , "new sms > error");
                 }
             }) {
                 @Override
@@ -264,7 +264,7 @@ public class service extends Service {
                     HashMap<String, String> newsms_headers = new HashMap<>();
                     newsms_headers.put("smsappkey", smsappkey);
                     newsms_headers.put("gateway", number_phone);
-                    Log.i("NewSMSSending", "Send Header");
+                    Log.i(TAG , "Send Header");
                     return newsms_headers;
                 }
             };
@@ -289,9 +289,9 @@ public class service extends Service {
                                 /*if sending from database is ok > Delete data from database*/
                                 Boolean ok_sent = mainObject.getBoolean("ok");
                                 if (ok_sent){
-                                    Log.i("SMS_Sent","SMS Sent | "+id_smsForSend);
+                                    Log.i(TAG ,"SMS Sent | "+id_smsForSend);
                                 }else {
-                                    Log.i("SMS_Sent","SMS NOT Sent | "+id_smsForSend);
+                                    Log.i(TAG ,"SMS NOT Sent | "+id_smsForSend);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -300,7 +300,7 @@ public class service extends Service {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.i("SMS_Sent", "sms sent > error");
+                    Log.i(TAG , "sms sent > error");
                 }
             })
             {
@@ -309,14 +309,14 @@ public class service extends Service {
                     HashMap<String, String> headers = new HashMap<>();
                     headers.put("smsappkey", smsappkey );
                     headers.put("gateway", number_phone );
-                    Log.i("SMS_Sent", "Send Header");
+                    Log.i(TAG , "Send Header");
                     return headers;
                 }
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> posting = new HashMap<>();
                     posting.put("smsid", id_smsForSend);
-                    Log.i("SMS_Sent","Send Parametr id | "+id_smsForSend);
+                    Log.i(TAG ,"Send Parametr id | "+id_smsForSend);
                     return posting;
                 }
             };AppContoroler.getInstance().addToRequestQueue(post_user_add);
