@@ -67,6 +67,7 @@
                             android:layout_height="30dp"/>
 
                         <TextView
+                            android:id="@+id/txv_versionNumber"
                             android:gravity="center|right"
                             android:layout_marginRight="10dp"
                             android:textColor="#fff"

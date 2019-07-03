@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     /*My value*/
     RelativeLayout Layout_ActivityMain;
     CheckBox status_CheckBox;
-    TextView tv_numberphone,tv_todayR,tv_todayS,tv_weekR,tv_weekS,tv_monthR,tv_monthS,tv_allR,tv_allS;
+    TextView tv_numberphone,tv_todayR,tv_todayS,tv_weekR,tv_weekS,tv_monthR,tv_monthS,tv_allR,tv_allS,txv_versionNumber;
     GifImageView GIFs;
     SwipeRefreshLayout Refresh_json;
 
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         /*My Value*/
         Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);
         status_CheckBox = findViewById(R.id.status_CheckBox);
+        txv_versionNumber = findViewById(R.id.txv_versionNumber);
         tv_numberphone = findViewById(R.id.tv_numberphone);
         tv_todayR = findViewById(R.id.tv_todayR);
         tv_todayS = findViewById(R.id.tv_todayS);
@@ -124,6 +126,14 @@ public class MainActivity extends AppCompatActivity {
         tv_allS = findViewById(R.id.tv_allS);
         GIFs = findViewById(R.id.GIFs);
         Refresh_json = findViewById(R.id.Refresh_json);
+        /*Set Version number*/
+        try {
+            PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
+            txv_versionNumber.setText(pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            txv_versionNumber.setText("12.0.0");
+        }
         /*Set Direction RTL*/
         ((GifDrawable)GIFs.getDrawable()).stop();
         ViewCompat.setLayoutDirection(Layout_ActivityMain,ViewCompat.LAYOUT_DIRECTION_RTL);
