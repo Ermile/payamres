@@ -54,11 +54,6 @@ public class MainActivity extends AppCompatActivity {
     String TAG = "MainActivity";
     public String phone_evazzadeh = "+989357269759";
 
-    String link_LastSMS = "https://khadije.com/api/v6/smsapp/notsent";
-    String link_newSMS = "https://khadije.com/api/v6/smsapp/queue";
-    String link_smsIsSent = "https://khadije.com/api/v6/smsapp/sent";
-    String id_smsForSend = null;
-
     /*sms App Key For API*/
     String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
 

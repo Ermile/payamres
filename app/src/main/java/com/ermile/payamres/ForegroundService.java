@@ -1,6 +1,5 @@
 package com.ermile.payamres;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,6 +12,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
 
@@ -31,15 +31,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ForegroundService extends Service {
+    /*Static Value*/
+    private static String TAG = "ForegroundService";
     String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
+    String link_dashboard = "https://khadije.com/api/v6/smsapp/dashboard";
     String link_LastSMS = "https://khadije.com/api/v6/smsapp/notsent";
     String link_newSMS = "https://khadije.com/api/v6/smsapp/queue";
     String link_smsIsSent = "https://khadije.com/api/v6/smsapp/sent";
     String id_smsForSend = null;
 
+    /*Value Static Notify*/
+    String day_send = "خالی";
+    String day_receive = "خالی";
+    String day_date = "درحال اتصال به سرور...";
+    /*Notification Static Value*/
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
-    private static String TAG = "ForegroundService";
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
+            .setContentTitle(day_date)
+            .setContentText("ارسالی: "+ day_send + " | " + "دریافتی: " + day_receive)
+            .setSmallIcon(android.R.drawable.btn_star);
+    NotificationManagerCompat notificationManager ;
 
+
+    /*Handler 30sec*/
     boolean powerServic = false;
     Handler handler = new Handler();
     Runnable runnable = new Runnable() {
@@ -47,8 +61,11 @@ public class ForegroundService extends Service {
         public void run() {
             Log.d(TAG, "run LastSMSSending ,"+" power Service is : "+powerServic);
             if (powerServic){
+                /*Set Value Notify*/
+                GetDashbord();
+                /*Run Send SMS*/
                 LastSMSSending(getBaseContext());
-                handler.postDelayed(runnable, 30000); //100 ms you should do it 4000
+                handler.postDelayed(runnable, 30000);
             }
         }
     };
@@ -61,19 +78,20 @@ public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        String input = intent.getStringExtra("inputExtra");
+        /*Crate Notification in start*/
         createNotificationChannel();
+        /*Intent go to app by toch*/
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Payamres is Running..")
-                .setContentText("Send: 10")
-                .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setContentIntent(pendingIntent)
-                .build();
-        startForeground(1, notification);
+        /*get notificationManager*/
+        notificationManager = NotificationManagerCompat.from(getApplicationContext());
+        /*Set Intent go to app by toch*/
+        builder.setContentIntent(pendingIntent);
+        notificationManager.notify(100, builder.build());
+        startForeground(100, builder.build());
 
+        /*Handler Starter */
         if (!powerServic){
             powerServic = true;
             handler.postDelayed(runnable, 0);
@@ -85,6 +103,7 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        /*Stop Handler in onDestroy*/
         powerServic = false;
         handler.removeCallbacks(runnable);
         Log.e(TAG,"onDestroy"+" --> "+powerServic);
@@ -301,5 +320,65 @@ public class ForegroundService extends Service {
             };AppContoroler.getInstance().addToRequestQueue(post_user_add);
         }
 
+    }
+
+    /*Get Dashbord*/
+    public void GetDashbord(){
+        /*Get Number Phone */
+        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+        final Boolean has_number = save_user.getBoolean("has_number", false);
+        final String number_phone = save_user.getString("number_phone", null);
+        /*Json*/
+        StringRequest post_user_add = new StringRequest(Request.Method.POST, link_dashboard,
+                new Response.Listener<String>(){
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject mainObject = new JSONObject(response);
+                            /*if sending from database is ok > Delete data from database*/
+                            Boolean ok_dashboard = mainObject.getBoolean("ok");
+                            if (ok_dashboard){
+                                JSONObject result = mainObject.getJSONObject("result");
+                                final Boolean status = result.getBoolean("status");
+
+                                JSONObject day = result.getJSONObject("day");
+                                if (!day.isNull("send")){
+                                    day_send = day.getString("send");
+                                }
+                                if (!day.isNull("receive")){
+                                    day_receive = day.getString("receive");
+                                }
+                                if (!day.isNull("date")){
+                                    day_date = day.getString("date");
+                                }
+
+                                /*Update Notify Text*/
+                                builder .setContentTitle(day_date)
+                                        .setContentText("ارسالی: "+ day_send + " | " + "دریافتی: " + day_receive);
+                                notificationManager.notify(100, builder.build());
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                day_date = "ارتباط ما قطع شده!";
+                day_receive = " ";
+                day_send = " ";
+
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders()  {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("smsappkey", smsappkey );
+                headers.put("gateway", number_phone );
+                return headers;
+            }
+        };AppContoroler.getInstance().addToRequestQueue(post_user_add);
     }
 }
