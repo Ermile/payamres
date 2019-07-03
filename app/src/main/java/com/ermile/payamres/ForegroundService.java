@@ -367,6 +367,10 @@ public class ForegroundService extends Service {
                 day_date = " ارتباط قطع شد!";
                 day_receive = " ";
                 day_send = " ";
+                /*Update Notify Text*/
+                builder .setContentTitle(" پیامرس - "+day_date)
+                        .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " );
+                notificationManager.notify(100, builder.build());
 
             }
         })
