@@ -48,7 +48,7 @@ public class ForegroundService extends Service {
             Log.d(TAG, "run LastSMSSending ,"+" power Service is : "+powerServic);
             if (powerServic){
                 LastSMSSending(getBaseContext());
-                handler.postDelayed(runnable, 10000); //100 ms you should do it 4000
+                handler.postDelayed(runnable, 30000); //100 ms you should do it 4000
             }
         }
     };
