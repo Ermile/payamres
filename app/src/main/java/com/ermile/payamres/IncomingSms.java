@@ -70,8 +70,11 @@ public class IncomingSms extends BroadcastReceiver {
         SharedPreferences.Editor SaveUser_editor = save_user.edit();
         final Boolean has_number = save_user.getBoolean("has_number", false);
         final String number_phone = save_user.getString("number_phone", null);
-        /*Start Services*/
-        startService(context);
+
+        if (has_number && number_phone!=null){
+            /*Start Services*/
+            startService(context);
+        }
 
         /** Receive SMS */
         if (intentExtras != null) {

@@ -82,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*Start Services*/
-        startService();
-
 
         /*Get save_user*/
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
@@ -97,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
         /*First Open app*/
         if (first_open && has_number){
+            /*Start Services*/
+            startService();
             SaveUser_editor.putBoolean("first_open",false);
             SaveUser_editor.apply();
         }
