@@ -42,13 +42,15 @@ public class ForegroundService extends Service {
 
     /*Value Static Notify*/
     String day_send = " ";
+    String payamres_string = "پیامرس";
     String day_receive = " ";
     String day_date = " ارتباط قطع شد!";
     /*Notification Static Value*/
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
-            .setContentTitle(" پیامرس - "+day_date)
+            .setContentTitle(day_date)
             .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " )
+            .setContentInfo(payamres_string)
             .setSmallIcon(R.drawable.logo_xml);
     NotificationManagerCompat notificationManager ;
 
@@ -352,7 +354,7 @@ public class ForegroundService extends Service {
                                 }
 
                                 /*Update Notify Text*/
-                                builder .setContentTitle(" پیامرس - "+day_date)
+                                builder .setContentTitle(day_date)
                                         .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " );
                                 notificationManager.notify(100, builder.build());
 
@@ -364,12 +366,10 @@ public class ForegroundService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                day_date = " ارتباط قطع شد!";
-                day_receive = " ";
-                day_send = " ";
+                day_send = " ارتباط قطع شد!";
                 /*Update Notify Text*/
-                builder .setContentTitle(" پیامرس - "+day_date)
-                        .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " );
+                builder .setContentTitle(day_date)
+                        .setContentText(day_send);
                 notificationManager.notify(100, builder.build());
 
             }
