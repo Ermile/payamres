@@ -48,8 +48,8 @@ public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
             .setContentTitle(day_date)
-            .setContentText("ارسالی: "+ day_send + " | " + "دریافتی: " + day_receive)
-            .setSmallIcon(android.R.drawable.btn_star);
+            .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " )
+            .setSmallIcon(R.drawable.logo_xml);
     NotificationManagerCompat notificationManager ;
 
 
@@ -326,7 +326,6 @@ public class ForegroundService extends Service {
     public void GetDashbord(){
         /*Get Number Phone */
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
         final String number_phone = save_user.getString("number_phone", null);
         /*Json*/
         StringRequest post_user_add = new StringRequest(Request.Method.POST, link_dashboard,
@@ -354,7 +353,7 @@ public class ForegroundService extends Service {
 
                                 /*Update Notify Text*/
                                 builder .setContentTitle(day_date)
-                                        .setContentText("ارسالی: "+ day_send + " | " + "دریافتی: " + day_receive);
+                                        .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " );
                                 notificationManager.notify(100, builder.build());
 
                             }
@@ -365,7 +364,7 @@ public class ForegroundService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                day_date = "ارتباط ما قطع شده!";
+                day_date = "ارتباط ما قطع شد!";
                 day_receive = " ";
                 day_send = " ";
 
