@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -366,6 +367,7 @@ public class ForegroundService extends Service {
                                 /*Update Notify Text*/
                                 builder .setContentTitle(day_date)
                                         .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " )
+                                        .setWhen(Calendar.getInstance().getTimeInMillis() )
                                 ;
                                 notificationManager.notify(100, builder.build());
 
