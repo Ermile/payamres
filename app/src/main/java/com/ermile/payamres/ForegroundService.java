@@ -43,7 +43,7 @@ public class ForegroundService extends Service {
     String id_smsForSend = null;
 
     /*Value Static Notify*/
-    String payamres_string = "پیامرس";
+    String payamres_string = " پیامرس ";
     String day_send = "قطع ارتباط!";
     String day_receive = "";
     String day_date = "";
@@ -52,7 +52,7 @@ public class ForegroundService extends Service {
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
             .setContentTitle(day_date)
             .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " )
-            .setContentInfo(payamres_string)
+            .setContentInfo("ارمایل")
             .setSmallIcon(R.drawable.logo_xml);
     NotificationManagerCompat notificationManager ;
 
@@ -77,7 +77,6 @@ public class ForegroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(this, "Started", Toast.LENGTH_SHORT).show();
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
         day_send = save_user.getString("save_Ds", "");
         day_receive = save_user.getString("save_Dr", "");
@@ -366,7 +365,7 @@ public class ForegroundService extends Service {
 
                                 /*Update Notify Text*/
                                 builder .setContentTitle(day_date)
-                                        .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " )
+                                        .setContentText(payamres_string + day_send+ " ارسال "+" - " + day_receive + " دریافت " )
                                         .setWhen(Calendar.getInstance().getTimeInMillis() )
                                 ;
                                 notificationManager.notify(100, builder.build());
