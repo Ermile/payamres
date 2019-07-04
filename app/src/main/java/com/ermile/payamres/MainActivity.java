@@ -51,6 +51,8 @@ import pl.droidsonroids.gif.GifImageView;
 
 public class MainActivity extends AppCompatActivity {
 
+    Context context;
+
     String TAG = "MainActivity";
     public String phone_evazzadeh = "+989357269759";
 
@@ -74,6 +76,21 @@ public class MainActivity extends AppCompatActivity {
 
     String noNull = null;
 
+
+
+    String day_send = "";
+    String day_receive = "";
+
+    String week_send = "";
+    String week_receive = "";
+
+    String month_send = "";
+    String month_receive = "";
+
+    String total_send = "";
+    String total_receive = "";
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -81,6 +98,18 @@ public class MainActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             versionAPP = pInfo.versionName;
+            final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+            day_send = save_user.getString("save_Ds", "");
+            day_receive = save_user.getString("save_Dr", "");
+
+            week_send = save_user.getString("save_Ws", "");
+            week_receive = save_user.getString("save_Wr", "");
+
+            month_send = save_user.getString("save_Ms", "");
+            month_receive = save_user.getString("save_Mr", "");
+
+            total_send = save_user.getString("save_As", "");
+            total_receive = save_user.getString("save_Ar", "");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             versionAPP = "last version";
@@ -308,6 +337,7 @@ public class MainActivity extends AppCompatActivity {
         Refresh_json = findViewById(R.id.Refresh_json);
         /*Get Number Phone */
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+        final SharedPreferences.Editor SaveUser_editor = save_user.edit();
         final Boolean has_number = save_user.getBoolean("has_number", false);
         final String number_phone = save_user.getString("number_phone", null);
         /*Json*/
@@ -334,20 +364,34 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                                 JSONObject day = result.getJSONObject("day");
-                                final String day_send = day.getString("send");
-                                final String day_receive = day.getString("receive");
+                                day_send = day.getString("send");
+                                day_receive = day.getString("receive");
 
                                 JSONObject week = result.getJSONObject("week");
-                                final String week_send = week.getString("send");
-                                final String week_receive = week.getString("receive");
+                                week_send = week.getString("send");
+                                week_receive = week.getString("receive");
 
                                 JSONObject month = result.getJSONObject("month");
-                                final String month_send = month.getString("send");
-                                final String month_receive = month.getString("receive");
+                                month_send = month.getString("send");
+                                month_receive = month.getString("receive");
 
                                 JSONObject total = result.getJSONObject("total");
-                                final String total_send = total.getString("send");
-                                final String total_receive = total.getString("receive");
+                                total_send = total.getString("send");
+                                total_receive = total.getString("receive");
+
+                                /*Save Dashboard*/
+                                SaveUser_editor.putString("save_Ds",day_send);
+                                SaveUser_editor.putString("save_Dr",day_receive);
+                                /*Week*/
+                                SaveUser_editor.putString("save_Ws",week_send);
+                                SaveUser_editor.putString("save_Wr",week_receive);
+                                /*Month*/
+                                SaveUser_editor.putString("save_Ms",month_send);
+                                SaveUser_editor.putString("save_Mr",month_receive);
+                                /*All*/
+                                SaveUser_editor.putString("save_As",total_send);
+                                SaveUser_editor.putString("save_Ar",total_receive);
+                                SaveUser_editor.apply();
 
                                 noNull = total_send+total_receive;
                                 if (noNull != null){
@@ -381,6 +425,22 @@ public class MainActivity extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                if (has_number){
+                    tv_numberphone.setText(number_phone);
+                }else {
+                    tv_numberphone.setText("No Number");
+                }
+                tv_allS.setText(total_send);
+                tv_allR.setText(total_receive);
+
+                tv_todayR.setText(day_receive);
+                tv_todayS.setText(day_send);
+
+                tv_weekR.setText(week_receive);
+                tv_weekS.setText(week_send);
+
+                tv_monthR.setText(month_receive);
+                tv_monthS.setText(month_send);
                 ((GifDrawable)GIFs.getDrawable()).stop();
                 Snackbar snackbar = Snackbar.make(Layout_ActivityMain,"Error Connection!", Snackbar.LENGTH_INDEFINITE)
                         .setAction("Refresh", new View.OnClickListener() {

@@ -73,7 +73,7 @@
                             android:textColor="#fff"
                             android:textSize="12sp"
                             android:padding="5dp"
-                            android:text="11.0.0"
+                            android:text=""
                             android:layout_width="match_parent"
                             android:layout_height="30dp"/>
 

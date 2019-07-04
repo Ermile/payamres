@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -41,10 +42,10 @@ public class ForegroundService extends Service {
     String id_smsForSend = null;
 
     /*Value Static Notify*/
-    String day_send = " ";
     String payamres_string = "پیامرس";
-    String day_receive = " ";
-    String day_date = " ارتباط قطع شد!";
+    String day_send = "ارتباط قطع شد!";
+    String day_receive = "";
+    String day_date = "";
     /*Notification Static Value*/
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this,CHANNEL_ID)
@@ -75,6 +76,11 @@ public class ForegroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Toast.makeText(this, "Started", Toast.LENGTH_SHORT).show();
+        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+        day_send = save_user.getString("save_Ds", "");
+        day_receive = save_user.getString("save_Dr", "");
+        day_date = save_user.getString("save_date", "");
     }
 
     @Override
@@ -229,9 +235,6 @@ public class ForegroundService extends Service {
                                                 id_smsForSend = getsms_Forsend.getString("id");
                                                 String smsto = getsms_Forsend.getString("fromnumber");
                                                 String sms_text = getsms_Forsend.getString("answertext");
-
-
-
                                                 try {
                                                     SmsManager smsManager = SmsManager.getDefault();
                                                     smsManager.sendTextMessage(smsto, null, sms_text, null, null);
@@ -328,6 +331,7 @@ public class ForegroundService extends Service {
     public void GetDashbord(){
         /*Get Number Phone */
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+        final SharedPreferences.Editor SaveUser_editor = save_user.edit();
         final String number_phone = save_user.getString("number_phone", null);
         /*Json*/
         StringRequest post_user_add = new StringRequest(Request.Method.POST, link_dashboard,
@@ -345,17 +349,24 @@ public class ForegroundService extends Service {
                                 JSONObject day = result.getJSONObject("day");
                                 if (!day.isNull("send")){
                                     day_send = day.getString("send");
+                                    SaveUser_editor.putString("save_Ds",day_send);
+                                    SaveUser_editor.apply();
                                 }
                                 if (!day.isNull("receive")){
                                     day_receive = day.getString("receive");
+                                    SaveUser_editor.putString("save_Dr",day_receive);
+                                    SaveUser_editor.apply();
                                 }
                                 if (!day.isNull("date")){
                                     day_date = day.getString("date");
+                                    SaveUser_editor.putString("save_date",day_date);
+                                    SaveUser_editor.apply();
                                 }
 
                                 /*Update Notify Text*/
                                 builder .setContentTitle(day_date)
-                                        .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " );
+                                        .setContentText(day_send+ " ارسال "+" - " + day_receive + " دریافت " )
+                                ;
                                 notificationManager.notify(100, builder.build());
 
                             }
