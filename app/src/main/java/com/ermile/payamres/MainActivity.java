@@ -411,11 +411,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void SendSMS_Tester(){
         try {
+            PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres "+versionAPP, null, null);
+            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres "+pInfo.versionName, null, null);
             Log.i(TAG , "SendSMS_Tester for phone_evazzadeh");
         } catch (Exception e) {
-            Log.i(TAG ,"No Send");
+            Log.i(TAG, "No Send");
         }
     }
 
