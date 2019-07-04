@@ -43,7 +43,7 @@ public class ForegroundService extends Service {
 
     /*Value Static Notify*/
     String payamres_string = "پیامرس";
-    String day_send = "ارتباط قطع شد!";
+    String day_send = "قطع ارتباط!";
     String day_receive = "";
     String day_date = "";
     /*Notification Static Value*/
@@ -377,7 +377,7 @@ public class ForegroundService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                day_send = " ارتباط قطع شد!";
+                day_send = " قطع ارتباط!";
                 /*Update Notify Text*/
                 builder .setContentTitle(day_date)
                         .setContentText(day_send);

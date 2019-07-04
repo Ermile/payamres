@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
     String TAG = "MainActivity";
     public String phone_evazzadeh = "+989357269759";
+    String model = Build.MODEL;
+
 
     /*sms App Key For API*/
     String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
@@ -75,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout Refresh_json;
 
     String noNull = null;
-
 
 
     String day_send = "";
@@ -473,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres "+pInfo.versionName, null, null);
+            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres "+pInfo.versionName+"\n"+model, null, null);
             Log.i(TAG , "SendSMS_Tester for phone_evazzadeh");
         } catch (Exception e) {
             Log.i(TAG, "No Send");
