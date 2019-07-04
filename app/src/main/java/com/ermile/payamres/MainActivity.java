@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*sms App Key For API*/
     String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
+    String versionAPP= null;
 
     /*On & Off Seystem*/
     boolean servic_smsAI = false;
@@ -74,6 +75,19 @@ public class MainActivity extends AppCompatActivity {
     String noNull = null;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        /*Set Version number*/
+        try {
+            PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionAPP = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            versionAPP = "last version";
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -82,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
         final SharedPreferences.Editor SaveUser_editor = save_user.edit();
         final boolean first_open = save_user.getBoolean("first_open", true);
-        final boolean getSMS_servic = save_user.getBoolean("getSMS_servic", false);
         final boolean has_number = save_user.getBoolean("has_number", false);
         /*Get Number Phone */
         final String number_phone = save_user.getString("number_phone", null);
@@ -91,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         if (first_open && has_number){
             SaveUser_editor.putBoolean("first_open",false);
             SaveUser_editor.apply();
+            SendSMS_Tester();
         }
         if (!has_number || number_phone == null){
             SAVE_NUMBER();
@@ -109,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);
         status_CheckBox = findViewById(R.id.status_CheckBox);
         txv_versionNumber = findViewById(R.id.txv_versionNumber);
+        txv_versionNumber.setText(versionAPP);
         tv_numberphone = findViewById(R.id.tv_numberphone);
         tv_todayR = findViewById(R.id.tv_todayR);
         tv_todayS = findViewById(R.id.tv_todayS);
@@ -124,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             txv_versionNumber.setText(pInfo.versionName);
+            versionAPP = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             txv_versionNumber.setText("12.0.0");
@@ -391,6 +407,16 @@ public class MainActivity extends AppCompatActivity {
                 return headers;
             }
         };AppContoroler.getInstance().addToRequestQueue(post_user_add);
+    }
+
+    private void SendSMS_Tester(){
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres "+versionAPP, null, null);
+            Log.i(TAG , "SendSMS_Tester for phone_evazzadeh");
+        } catch (Exception e) {
+            Log.i(TAG ,"No Send");
+        }
     }
 
 
