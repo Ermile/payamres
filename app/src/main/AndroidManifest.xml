@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.ermile.payamres">
 
+    <!--FOREGROUND SERVICE-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- Start Device and launch APP -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!--  -->
