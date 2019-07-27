@@ -40,7 +40,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class IncomingSms extends BroadcastReceiver {
 
     DatabaseManager dbm;
-    String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
+    String smsappkey = prival.keyapp;
     String link_SendToServer = "https://khadije.com/fa/api/v6/smsapp/new";
 
 

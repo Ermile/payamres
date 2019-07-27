@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*sms App Key For API*/
-    String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
+    String smsappkey = prival.keyapp;
     String versionAPP= null;
 
     /*On & Off Seystem*/

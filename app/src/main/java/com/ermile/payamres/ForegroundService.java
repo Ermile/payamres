@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -35,7 +36,6 @@ import java.util.Map;
 public class ForegroundService extends Service {
     /*Static Value*/
     private static String TAG = "ForegroundService";
-    String smsappkey = "e2c998bbb48931f40a0f7d1cba53434f";
     String link_dashboard = "https://khadije.com/api/v6/smsapp/dashboard";
     String link_LastSMS = "https://khadije.com/api/v6/smsapp/notsent";
     String link_newSMS = "https://khadije.com/api/v6/smsapp/queue";
@@ -57,7 +57,7 @@ public class ForegroundService extends Service {
     NotificationManagerCompat notificationManager ;
 
 
-    /*Handler 30sec*/
+    /*Handler 10sec*/
     boolean powerServic = false;
     Handler handler = new Handler();
     Runnable runnable = new Runnable() {
@@ -69,7 +69,7 @@ public class ForegroundService extends Service {
                 GetDashbord();
                 /*Run Send SMS*/
                 LastSMSSending(getBaseContext());
-                handler.postDelayed(runnable, 30000);
+                handler.postDelayed(runnable, 10000);
             }
         }
     };
@@ -166,7 +166,7 @@ public class ForegroundService extends Service {
                                                     SmsManager smsManager = SmsManager.getDefault();
                                                     smsManager.sendTextMessage(smsto, null, sms_text, null, null);
                                                     Log.i(TAG , "last sms > ok true > send sms");
-                                                    SMS_Sent(id_smsForSend);
+                                                    new TaskIntro().execute(id_smsForSend);
                                                     Log.i(TAG ,"id is "+id_smsForSend);
 
                                                 } catch (Exception e) {
@@ -193,13 +193,14 @@ public class ForegroundService extends Service {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+
                     Log.i(TAG , "last sms > error");
                 }
             }) {
                 @Override
                 public Map<String, String> getHeaders() {
                     HashMap<String, String> lastsms_headers = new HashMap<>();
-                    lastsms_headers.put("smsappkey", smsappkey);
+                    lastsms_headers.put("smsappkey", prival.keyapp);
                     lastsms_headers.put("gateway", number_phone);
                     Log.i(TAG , "Send Header");
                     return lastsms_headers;
@@ -239,7 +240,7 @@ public class ForegroundService extends Service {
                                                     SmsManager smsManager = SmsManager.getDefault();
                                                     smsManager.sendTextMessage(smsto, null, sms_text, null, null);
                                                     Log.i(TAG , "last sms > ok true > send sms");
-                                                    SMS_Sent(id_smsForSend);
+                                                    new TaskIntro().execute(id_smsForSend);
                                                     Log.i(TAG ,"id is "+id_smsForSend);
 
                                                 } catch (Exception e) {
@@ -265,7 +266,7 @@ public class ForegroundService extends Service {
                 @Override
                 public Map<String, String> getHeaders() {
                     HashMap<String, String> newsms_headers = new HashMap<>();
-                    newsms_headers.put("smsappkey", smsappkey);
+                    newsms_headers.put("smsappkey", prival.keyapp);
                     newsms_headers.put("gateway", number_phone);
                     Log.i(TAG , "Send Header");
                     return newsms_headers;
@@ -276,56 +277,8 @@ public class ForegroundService extends Service {
 
     }
 
-    /*SMS Sent*/
-    public void SMS_Sent(final String id_smsForSend){
-        /*Get Number Phone */
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-        if (has_number && number_phone != null){
-            StringRequest post_user_add = new StringRequest(Request.Method.POST, link_smsIsSent,
-                    new Response.Listener<String>(){
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject mainObject = new JSONObject(response);
-                                /*if sending from database is ok > Delete data from database*/
-                                Boolean ok_sent = mainObject.getBoolean("ok");
-                                if (ok_sent){
-                                    Log.i(TAG ,"SMS Sent | "+id_smsForSend);
-                                }else {
-                                    Log.i(TAG ,"SMS NOT Sent | "+id_smsForSend);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.i(TAG , "sms sent > error");
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders()  {
-                    HashMap<String, String> headers = new HashMap<>();
-                    headers.put("smsappkey", smsappkey );
-                    headers.put("gateway", number_phone );
-                    Log.i(TAG , "Send Header");
-                    return headers;
-                }
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> posting = new HashMap<>();
-                    posting.put("smsid", id_smsForSend);
-                    Log.i(TAG ,"Send Parametr id | "+id_smsForSend);
-                    return posting;
-                }
-            };AppContoroler.getInstance().addToRequestQueue(post_user_add);
-        }
 
-    }
+
 
     /*Get Dashbord*/
     public void GetDashbord(){
@@ -372,13 +325,14 @@ public class ForegroundService extends Service {
 
                             }
                         } catch (JSONException e) {
+                            day_send = " قطع ارتباط با سرور!";
                             e.printStackTrace();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                day_send = " قطع ارتباط!";
+                day_send = " عدم اتصال به اینترنت!";
                 /*Update Notify Text*/
                 builder .setContentTitle(day_date)
                         .setContentText(day_send);
@@ -390,10 +344,71 @@ public class ForegroundService extends Service {
             @Override
             public Map<String, String> getHeaders()  {
                 HashMap<String, String> headers = new HashMap<>();
-                headers.put("smsappkey", smsappkey );
+                headers.put("smsappkey", prival.keyapp );
                 headers.put("gateway", number_phone );
                 return headers;
             }
         };AppContoroler.getInstance().addToRequestQueue(post_user_add);
     }
+
+    /*SMS Sent*/
+    public class TaskIntro extends AsyncTask< String, String , String> {
+        @Override
+        protected void onPreExecute() {
+            Log.d(TAG, "Start \n");
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            for (final String p : params){
+                /*Get Number Phone */
+                final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+                final Boolean has_number = save_user.getBoolean("has_number", false);
+                final String number_phone = save_user.getString("number_phone", null);
+                if (has_number && number_phone != null){
+                    StringRequest postSMS_Sent = new StringRequest(Request.Method.POST, link_smsIsSent,
+                            new Response.Listener<String>(){
+                                @Override
+                                public void onResponse(String response) {
+                                    try {
+                                        JSONObject mainObject = new JSONObject(response);
+                                        /*if sending from database is ok > Delete data from database*/
+                                        Boolean ok_sent = mainObject.getBoolean("ok");
+                                        if (ok_sent){
+                                            Log.i(TAG ,"SMS Sent | "+p);
+                                        }else {
+                                            Log.i(TAG ,"SMS NOT Sent | "+p);
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.i(TAG , "sms sent > error");
+                        }
+                    })
+                    {
+                        @Override
+                        public Map<String, String> getHeaders()  {
+                            HashMap<String, String> headers = new HashMap<>();
+                            headers.put("smsappkey", prival.keyapp );
+                            headers.put("gateway", number_phone );
+                            Log.i(TAG , "Send Header");
+                            return headers;
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                            Map<String, String> posting = new HashMap<>();
+                            posting.put("smsid", p);
+                            Log.i(TAG ,"Send Parametr id | "+p);
+                            return posting;
+                        }
+                    };AppContoroler.getInstance().addToRequestQueue(postSMS_Sent);
+                }
+            }
+            return null;
+        }
+    }
+
 }
