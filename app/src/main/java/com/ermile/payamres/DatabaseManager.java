@@ -10,11 +10,12 @@ import android.util.Log;
 public class DatabaseManager extends SQLiteOpenHelper {
 
     private static final String DatabaseName = "myinfo.db";
-    private static final int Version = 1;
+    private static final int Version = 2;
     private static final String TableName = "tbl_person";
     private static final String dID = "id";
     private static final String dNumber = "Number";
     private static final String dMassage = "Massage";
+    private static final String dIsSend = "IsSend";
     private static final String dTime = "time";
 
     public DatabaseManager(Context cnt) {
@@ -32,6 +33,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
                 + " ( " + dID + " INTEGER PRIMARY KEY UNIQUE, "
                 + dNumber + " TEXT, "
                 + dMassage + " TEXT, "
+                + dIsSend + " TEXT, "
                 + dTime + " TEXT );";
         cdb.execSQL(cQuery);
         Log.i("Mahdi", "Table Created!");
@@ -50,6 +52,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
         icv.put(dID, iprs.pID);
         icv.put(dNumber, iprs.pNumber);
         icv.put(dMassage, iprs.pMassage);
+        icv.put(dIsSend, iprs.pIsSend);
         icv.put(dTime, iprs.pTime);
         idb.insert(TableName, null, icv);
         idb.close();
@@ -61,12 +64,13 @@ public class DatabaseManager extends SQLiteOpenHelper {
 
         Person gPrs = new Person();
         SQLiteDatabase gdb = this.getReadableDatabase();
-        String gQuery = "SELECT * FROM " + TableName + " WHERE " + dID + "=" + gID;
+        String gQuery = "SELECT * FROM " + TableName + " WHERE " + dIsSend + "=" + "false";
         Cursor gCur = gdb.rawQuery(gQuery, null);
         if (gCur.moveToFirst()) {
-            gPrs.pNumber = gCur.getString(1);
-            gPrs.pMassage = gCur.getString(2);
-            gPrs.pTime = gCur.getString(3);
+            gPrs.pNumber = gCur.getString(gCur.getColumnIndex(dNumber));
+            gPrs.pMassage = gCur.getString(gCur.getColumnIndex(dMassage));
+            gPrs.pIsSend = gCur.getString(gCur.getColumnIndex(dIsSend));
+            gPrs.pTime = gCur.getString(gCur.getColumnIndex(dTime));
         }
         Log.i("Mahdi", "getPerson Method");
         return gPrs;
@@ -74,10 +78,10 @@ public class DatabaseManager extends SQLiteOpenHelper {
     }
 
 
-    public boolean deletePerson(Person dprs) {
+    public boolean deletePerson() {
 
         SQLiteDatabase ddb = this.getWritableDatabase();
-        long dResult = ddb.delete(TableName, dID + "=?", new String[] {String.valueOf(dprs.pID)});
+        long dResult = ddb.delete(TableName, dIsSend + "true",null);
 
         Log.i("Mahdi", "deletePerson Method");
 
@@ -96,12 +100,6 @@ public class DatabaseManager extends SQLiteOpenHelper {
         int cResult = gCur.getCount();
         return cResult;
 
-    }
-
-    public void removeAll()
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TableName, null, null);
     }
 
 }

@@ -65,10 +65,8 @@ public class ForegroundService extends Service {
         public void run() {
             Log.d(TAG, "run LastSMSSending ,"+" power Service is : "+powerServic);
             if (powerServic){
-                /*Set Value Notify*/
-                GetDashbord();
                 /*Run Send SMS*/
-                LastSMSSending(getBaseContext());
+                NewSMSSending(getBaseContext());
                 handler.postDelayed(runnable, 10000);
             }
         }
@@ -85,7 +83,6 @@ public class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         /*Crate Notification in start*/
         createNotificationChannel();
         /*Intent go to app by toch*/
@@ -134,81 +131,6 @@ public class ForegroundService extends Service {
             manager.createNotificationChannel(serviceChannel);
             Log.i(TAG,"createNotificationChannel");
         }
-    }
-
-    /*Last SMS for Sending*/
-    public void LastSMSSending(final Context context_LastSMSSending){
-        /*Get Number Phone */
-        final SharedPreferences save_user = context_LastSMSSending.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-        if (has_number && number_phone != null){
-            StringRequest post_LastSMSSending = new StringRequest(Request.Method.POST, link_LastSMS,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject mainObject = new JSONObject(response);
-                                /*if sending from database is ok > Delete data from database*/
-                                Boolean ok_dashboard = mainObject.getBoolean("ok");
-                                if (ok_dashboard) {
-                                    if (!mainObject.isNull("result")){
-                                        JSONArray result = mainObject.getJSONArray("result");
-                                        for (int newM = 0; newM <= result.length(); newM++) {
-                                            JSONObject getsms_Forsend = result.getJSONObject(newM);
-                                            id_smsForSend = null;
-                                            if(!getsms_Forsend.isNull("id")){
-                                                id_smsForSend = getsms_Forsend.getString("id");
-                                                String smsto = getsms_Forsend.getString("fromnumber");
-                                                String sms_text = getsms_Forsend.getString("answertext");
-
-                                                try {
-                                                    SmsManager smsManager = SmsManager.getDefault();
-                                                    smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                    Log.i(TAG , "last sms > ok true > send sms");
-                                                    new TaskIntro().execute(id_smsForSend);
-                                                    Log.i(TAG ,"id is "+id_smsForSend);
-
-                                                } catch (Exception e) {
-                                                    Log.i(TAG ,"No Send last sms"+"\n"+smsto+"\n"+sms_text);
-                                                }
-                                            }else {
-                                                id_smsForSend = null;
-                                            }
-
-
-
-                                        }
-                                    }else {
-                                        NewSMSSending(context_LastSMSSending);
-                                        Log.i(TAG , "last sms > no sms for send :) > Check new sms");
-                                    }
-
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    Log.i(TAG , "last sms > error");
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() {
-                    HashMap<String, String> lastsms_headers = new HashMap<>();
-                    lastsms_headers.put("smsappkey", prival.keyapp);
-                    lastsms_headers.put("gateway", number_phone);
-                    Log.i(TAG , "Send Header");
-                    return lastsms_headers;
-                }
-            };
-            AppContoroler.getInstance().addToRequestQueue(post_LastSMSSending);
-        }
-
     }
 
     /*New SMS for Sending*/
@@ -277,80 +199,6 @@ public class ForegroundService extends Service {
 
     }
 
-
-
-
-    /*Get Dashbord*/
-    public void GetDashbord(){
-        /*Get Number Phone */
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final String number_phone = save_user.getString("number_phone", null);
-        /*Json*/
-        StringRequest post_user_add = new StringRequest(Request.Method.POST, link_dashboard,
-                new Response.Listener<String>(){
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject mainObject = new JSONObject(response);
-                            /*if sending from database is ok > Delete data from database*/
-                            Boolean ok_dashboard = mainObject.getBoolean("ok");
-                            if (ok_dashboard){
-                                JSONObject result = mainObject.getJSONObject("result");
-                                final Boolean status = result.getBoolean("status");
-
-                                JSONObject day = result.getJSONObject("day");
-                                if (!day.isNull("send")){
-                                    day_send = day.getString("send");
-                                    SaveUser_editor.putString("save_Ds",day_send);
-                                    SaveUser_editor.apply();
-                                }
-                                if (!day.isNull("receive")){
-                                    day_receive = day.getString("receive");
-                                    SaveUser_editor.putString("save_Dr",day_receive);
-                                    SaveUser_editor.apply();
-                                }
-                                if (!day.isNull("date")){
-                                    day_date = day.getString("date");
-                                    SaveUser_editor.putString("save_date",day_date);
-                                    SaveUser_editor.apply();
-                                }
-
-                                /*Update Notify Text*/
-                                builder .setContentTitle(day_date)
-                                        .setContentText(payamres_string + day_send+ " ارسال "+" - " + day_receive + " دریافت " )
-                                        .setWhen(Calendar.getInstance().getTimeInMillis() )
-                                ;
-                                notificationManager.notify(100, builder.build());
-
-                            }
-                        } catch (JSONException e) {
-                            day_send = " قطع ارتباط با سرور!";
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                day_send = " عدم اتصال به اینترنت!";
-                /*Update Notify Text*/
-                builder .setContentTitle(day_date)
-                        .setContentText(day_send);
-                notificationManager.notify(100, builder.build());
-
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders()  {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("smsappkey", prival.keyapp );
-                headers.put("gateway", number_phone );
-                return headers;
-            }
-        };AppContoroler.getInstance().addToRequestQueue(post_user_add);
-    }
-
     /*SMS Sent*/
     public class TaskIntro extends AsyncTask< String, String , String> {
         @Override
@@ -410,5 +258,15 @@ public class ForegroundService extends Service {
             return null;
         }
     }
+
+    private void updateNotifForground(String dayDesc,String SendSMS, String ReceiveSMS){
+        /*Update Notify Text*/
+        builder .setContentTitle(dayDesc)
+                .setContentText(payamres_string + SendSMS+ " ارسال "+" - " + ReceiveSMS + " دریافت " )
+                .setWhen(Calendar.getInstance().getTimeInMillis() )
+        ;
+        notificationManager.notify(100, builder.build());
+    }
+
 
 }

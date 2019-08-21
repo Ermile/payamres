@@ -31,4 +31,5 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
     implementation 'com.github.medyo:fancybuttons:1.9.1'
     implementation 'com.github.nisrulz:sensey:1.8.0'
+    implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
 }
