@@ -16,10 +16,10 @@ public class IncomingSms extends BroadcastReceiver {
     private static String TAG = "IncomingSms";
 
     public void onReceive(final Context context, Intent intent) {
-        final SQLiteDatabase smsDatabase = new sql_SmsDatabase(context).getWritableDatabase();
+        final SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
 
         if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
-            Log.d(TAG, "onReceive -Start");
+            Log.i(TAG, "onReceive -Start");
             Bundle bundle = intent.getExtras();
             SmsMessage[] msgs = null;
             String numberSMS,textSMS,timeSMS,idSMS,userDataSMS;
@@ -30,6 +30,7 @@ public class IncomingSms extends BroadcastReceiver {
                     msgs = new SmsMessage[pdus.length];
                     for(int i=0; i<msgs.length; i++){
                         msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+
                         numberSMS = msgs[i].getOriginatingAddress();
                         textSMS = msgs[i].getMessageBody();
                         timeSMS = DateFormat.getDateTimeInstance().format(new Date());
@@ -45,25 +46,18 @@ public class IncomingSms extends BroadcastReceiver {
                                 "\n ---------------------------------Finish--------------------------------------");
 
                         /*Add SMS To Database*/
-                        String addSmsToDatabase =
-                                "INSERT INTO smsTable (number,text,time,massageId,massageData,isSend) " +
-                                "Values (" +
-                                        "'"+numberSMS+"'," +
-                                        " '"+textSMS+"'," +
-                                        " '"+timeSMS+"'," +
-                                        " '"+idSMS+"'," +
-                                        " '"+userDataSMS+"'," +
-                                        " 'false')";
-                        smsDatabase.execSQL(addSmsToDatabase);
+                        smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
+                        Log.i(TAG, "Query SQL: INSERT > "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
 
                         /*Log Database*/
-                        Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM smsTable", null);
+                        Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_GetSMS, null);
                         while (infoDatabaseSMS.moveToNext()) {
                             int id = infoDatabaseSMS.getInt(infoDatabaseSMS.getColumnIndex("id")) ;
                             String number = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("number")) ;
                             String text = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("text")) ;
-                            String isSend = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("isSend")) ;
-                            Log.i(TAG, "Dtabase: "+id+" - number: "+number +" | text: "+text +" | isSend: "+isSend);
+                            String isSend = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("isSendToServer")) ;
+                            String serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("serverID")) ;
+                            Log.d(TAG, "Dtabase: "+id+" - number: "+number +" | text: "+text +" | isSendToServer | ServerID: "+isSend +" | "+serverID);
                         }
                     }
                 }catch(Exception e){
@@ -71,5 +65,30 @@ public class IncomingSms extends BroadcastReceiver {
                 }
             }
         }
+    }
+
+
+    private String insertToGetSMS (String number,String text,String date,String smsID,String userData,String isSendToServer,String serverID){
+        String getSMS_insert =
+                "INSERT INTO "+ DatabaseSMS.table_GetSMS
+                        + "("+ DatabaseSMS.getSMS_number +","
+                        + DatabaseSMS.getSMS_text + ","
+                        + DatabaseSMS.getSMS_date + ","
+                        + DatabaseSMS.getSMS_smsID + ","
+                        + DatabaseSMS.getSMS_userData + ","
+                        + DatabaseSMS.getSMS_isSendToServer + ","
+                        + DatabaseSMS.getSMS_serverID + ")"
+
+                        + "Values (" +
+                        "'"+number+"'," +
+                        " '"+text+"'," +
+                        " '"+date+"'," +
+                        " '"+smsID+"'," +
+                        " '"+userData+"'," +
+                        " '"+isSendToServer+"'," +
+                        " '"+serverID+"' )";
+
+        return getSMS_insert;
+
     }
 }

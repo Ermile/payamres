@@ -112,6 +112,9 @@ public class ForegroundService extends Service {
         powerServic = false;
         handler.removeCallbacks(runnable);
         Log.e(TAG,"onDestroy"+" --> "+powerServic);
+
+        Intent goToMain = new Intent(this,MainActivity.class);
+        startActivity(goToMain);
     }
 
     @Nullable
