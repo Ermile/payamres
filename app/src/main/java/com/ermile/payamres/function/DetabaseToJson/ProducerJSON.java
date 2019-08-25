@@ -1,4 +1,4 @@
-package com.ermile.payamres.CrateJSON;
+package com.ermile.payamres.function.DetabaseToJson;
 
 import android.Manifest;
 import android.content.Context;
@@ -10,40 +10,39 @@ import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.ermile.payamres.CrateJSON.items.detail_jsonObject;
-import com.ermile.payamres.CrateJSON.items.main_jsonObject;
-import com.ermile.payamres.CrateJSON.items.sentsms_jsonArray;
-import com.ermile.payamres.CrateJSON.items.smsnew_jsonArray;
+import com.ermile.payamres.function.DetabaseToJson.ItemsJson.detail_jsonObject;
+import com.ermile.payamres.function.DetabaseToJson.ItemsJson.main_jsonObject;
+import com.ermile.payamres.function.DetabaseToJson.ItemsJson.sentsms_jsonArray;
+import com.ermile.payamres.function.DetabaseToJson.ItemsJson.smsnew_jsonArray;
 import com.ermile.payamres.DatabaseSMS;
 import com.ermile.payamres.save_user;
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class json_crated {
-
-
+public class ProducerJSON {
     Context context;
-
-    public json_crated(Context context) {
+    
+    public ProducerJSON(Context context) {
         this.context = context;
-        JsonApp(context);
+        Producer(context);
     }
 
-    public String JsonApp(Context context){
-        detail_jsonObject detail_Json = new detail_jsonObject("09195191378");
-        main_jsonObject mJson = new main_jsonObject("true",detail_Json);
-        GetSMS_Send(context,mJson);
+    public String Producer(Context context){
+        try {
+            detail_jsonObject detail_Json = new detail_jsonObject("09195191378");
+            main_jsonObject mJson = new main_jsonObject("true",detail_Json);
+            GetSMS_Send(context,mJson);
 
-        Gson gson = new Gson();
-        Log.i(save_user.pTag, "JSON > "+gson.toJson(mJson));
-        return gson.toJson(mJson);
+            Gson gson = new Gson();
+            Log.i(save_user.pTag, "JSON > "+gson.toJson(mJson));
+            return gson.toJson(mJson);
+
+        }catch (Exception error){
+            Log.e(save_user.pTag, "Producer Error: "+error,null );
+            return "Producer Error: "+error;
+        }
     }
-
-
-
-
 
     private void GetSMS_Send(Context context,main_jsonObject mainJsonObject){
         try {
@@ -73,7 +72,7 @@ public class json_crated {
                 smsNew.add(new smsnew_jsonArray(id,number,text,date,smsID,userData,brand,model,SimSerialNumber));
                 mainJsonObject.setSmsNew(smsNew);
 
-//            Log.d(save_user.pTag, "json_crated > smsNew[] "+ id +" | "+ number +" | "+ text +" | "+ date +" | "+ smsID +" | "+ userData +" | "+ brand +" | "+ model +" | "+ SimSerialNumber );
+//            Log.d(save_user.pTag, "json crated > smsNew[] "+ id +" | "+ number +" | "+ text +" | "+ date +" | "+ smsID +" | "+ userData +" | "+ brand +" | "+ model +" | "+ SimSerialNumber );
             }
             smsDatabase.close();
             GetSMS_Sent(context,mainJsonObject);
@@ -98,7 +97,7 @@ public class json_crated {
                 smsSent.add(new sentsms_jsonArray(id,smsID,serverID));
                 mainJsonObject.setSmsSent(smsSent);
 
-                Log.d(save_user.pTag, "json_crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
+                Log.d(save_user.pTag, "json crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
             }
             smsDatabase.close();
         }catch (Exception error){

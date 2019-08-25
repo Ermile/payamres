@@ -30,25 +30,18 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.ermile.payamres.CrateJSON.json_crated;
-import com.ermile.payamres.item.arraySchool;
-import com.ermile.payamres.item.school;
-import com.ermile.payamres.item.techer;
+import com.ermile.payamres.function.DetabaseToJson.ProducerJSON;
 import com.ermile.payamres.network.AppContoroler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
-
-import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
     String TAG = "MainActivity";
@@ -102,21 +95,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        json_crated JsonCrated = new json_crated(getApplicationContext());
-        String JsonDatabase = JsonCrated.JsonApp(getApplicationContext());
+        ProducerJSON producer_JSON = new ProducerJSON(getApplicationContext());
+        String textJsonDatabaseSMS = producer_JSON.Producer(getApplicationContext());
 
-        alertDialog("Json: ",JsonDatabase,"ok",false);
-
-
-        /*techer testgson = new techer("amin","09195191387");
-        school schoolGson = new school("MalekZadeh","Mele",testgson);
-        List<arraySchool> arraySchools = new ArrayList<>();
-        for (int i = 0; i <100; i++) {
-            arraySchools.add(new arraySchool(i + "", "amin " + i));
-            schoolGson.setArraySchoolList(arraySchools);
-        }
-        Gson gson = new Gson();
-        Log.i("DatabaseToJSON", ""+gson.toJson(schoolGson));*/
+        alertDialog("Json: ",textJsonDatabaseSMS,"Share",false);
 
 
         /*Get save_user*/
