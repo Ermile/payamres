@@ -38,8 +38,6 @@ import java.util.Map;
 public class ForegroundService extends Service {
     /*Static Value*/
     private static String TAG = "ForegroundService";
-    String link_dashboard = "https://khadije.com/api/v6/smsapp/dashboard";
-    String link_LastSMS = "https://khadije.com/api/v6/smsapp/notsent";
     String link_newSMS = "https://khadije.com/api/v6/smsapp/queue";
     String link_smsIsSent = "https://khadije.com/api/v6/smsapp/sent";
     String id_smsForSend = null;

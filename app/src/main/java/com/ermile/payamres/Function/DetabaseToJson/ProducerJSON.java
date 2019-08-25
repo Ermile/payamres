@@ -15,7 +15,7 @@ import com.ermile.payamres.Function.DetabaseToJson.ItemsJson.main_jsonObject;
 import com.ermile.payamres.Function.DetabaseToJson.ItemsJson.sentsms_jsonArray;
 import com.ermile.payamres.Function.DetabaseToJson.ItemsJson.smsnew_jsonArray;
 import com.ermile.payamres.Function.DatabaseSMS;
-import com.ermile.payamres.Function.SaveDataUser.save_user;
+import com.ermile.payamres.Static.av;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +31,15 @@ public class ProducerJSON {
     public String Producer(Context context){
         try {
             detail_jsonObject detail_Json = new detail_jsonObject("09195191378");
-            main_jsonObject mJson = new main_jsonObject("true",detail_Json);
+            main_jsonObject mJson = new main_jsonObject(false,detail_Json);
             GetSMS_Send(context,mJson);
 
             Gson gson = new Gson();
-            Log.i(save_user.pTag, "JSON > "+gson.toJson(mJson));
+            Log.i(av.pTag, "JSON > "+gson.toJson(mJson));
             return gson.toJson(mJson);
 
         }catch (Exception error){
-            Log.e(save_user.pTag, "Producer Error: "+error,null );
+            Log.e(av.pTag, "Producer Error: "+error,null );
             return "Producer Error: "+error;
         }
     }
@@ -77,7 +77,7 @@ public class ProducerJSON {
             smsDatabase.close();
             GetSMS_Sent(context,mainJsonObject);
         }catch (Exception error){
-            Log.e(save_user.pTag, "Get SMS Send from database: "+error,null);
+            Log.e(av.pTag, "Get SMS Send from database: "+error,null);
         }
 
     }
@@ -97,11 +97,11 @@ public class ProducerJSON {
                 smsSent.add(new sentsms_jsonArray(id,smsID,serverID));
                 mainJsonObject.setSmsSent(smsSent);
 
-                Log.d(save_user.pTag, "json crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
+                Log.d(av.pTag, "json crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
             }
             smsDatabase.close();
         }catch (Exception error){
-            Log.e(save_user.pTag, "GetSMS_Sent from database : "+error,null );
+            Log.e(av.pTag, "GetSMS_Sent from database : "+error,null );
         }
 
 
