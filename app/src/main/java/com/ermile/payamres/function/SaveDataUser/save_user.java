@@ -1,4 +1,4 @@
-package com.ermile.payamres;
+package com.ermile.payamres.Function.SaveDataUser;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,11 +8,7 @@ import android.preference.PreferenceManager;
 public class save_user extends PreferenceActivity {
 
 
-    public static String pTag = "AllLogForPayamresApp";
 
-    public static String link_status = "https://khadije.com/api/v6/smsapp/status";
-    public static String link_dashboard = "https://khadije.com/api/v6/smsapp/dashboard";
-    public static String phone_evazzadeh = "+989357269759";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

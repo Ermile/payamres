@@ -1,4 +1,4 @@
-package com.ermile.payamres;
+package com.ermile.payamres.Function;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
+
+import com.ermile.payamres.Function.DatabaseSMS;
 
 import java.text.DateFormat;
 import java.util.Date;

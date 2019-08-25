@@ -30,8 +30,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.ermile.payamres.function.DetabaseToJson.ProducerJSON;
-import com.ermile.payamres.network.AppContoroler;
+import com.ermile.payamres.Function.DetabaseToJson.ProducerJSON;
+import com.ermile.payamres.Function.ForegroundService;
+import com.ermile.payamres.Function.SaveDataUser.save_user;
+import com.ermile.payamres.Static.Network.AppContoroler;
+import com.ermile.payamres.Function.SaveDataUser.prival;
+import com.ermile.payamres.Static.av;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -226,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         final Boolean has_number = save_userSHP.getBoolean("has_number", false);
         final String number_phone = save_userSHP.getString("number_phone", null);
         if (has_number && number_phone != null){
-            StringRequest post_user_add = new StringRequest(Request.Method.POST, save_user.link_status,
+            StringRequest post_user_add = new StringRequest(Request.Method.POST, av.link_status,
                     new Response.Listener<String>(){
                         @Override
                         public void onResponse(String response) {
@@ -321,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
         final Boolean has_number = save_userSHP.getBoolean("has_number", false);
         final String number_phone = save_userSHP.getString("number_phone", null);
         /*Json*/
-        StringRequest post_user_add = new StringRequest(Request.Method.POST, save_user.link_dashboard,
+        StringRequest post_user_add = new StringRequest(Request.Method.POST, av.link_dashboard,
                 new Response.Listener<String>(){
                     @Override
                     public void onResponse(String response) {
@@ -453,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(save_user.phone_evazzadeh, null, "Payamres "+pInfo.versionName+"\n"+model, null, null);
+            smsManager.sendTextMessage(av.phone_evazzadeh, null, "Payamres "+pInfo.versionName+"\n"+model, null, null);
             Log.i(TAG , "SendSMS_Tester for phone_evazzadeh");
         } catch (Exception e) {
             Log.i(TAG, "No Send");

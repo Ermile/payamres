@@ -1,4 +1,4 @@
-package com.ermile.payamres;
+package com.ermile.payamres.Function;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -16,14 +16,16 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.ermile.payamres.network.AppContoroler;
+import com.ermile.payamres.MainActivity;
+import com.ermile.payamres.R;
+import com.ermile.payamres.Static.Network.AppContoroler;
+import com.ermile.payamres.Function.SaveDataUser.prival;
 
 import org.json.JSONArray;
 import org.json.JSONException;
