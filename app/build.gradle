@@ -32,4 +32,5 @@ dependencies {
     implementation 'com.github.medyo:fancybuttons:1.9.1'
     implementation 'com.github.nisrulz:sensey:1.8.0'
     implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
+    implementation 'com.google.code.gson:gson:2.8.5'
 }

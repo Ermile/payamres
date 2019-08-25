@@ -10,6 +10,7 @@ public class DatabaseSMS extends SQLiteAssetHelper {
 
     /*Table Get SMS*/
     public static String table_GetSMS = "GetSMS";
+    public static String getSMS_localID ="id";
     public static String getSMS_number ="number";
     public static String getSMS_text ="text";
     public static String getSMS_date ="date";
@@ -21,6 +22,7 @@ public class DatabaseSMS extends SQLiteAssetHelper {
 
     /*Table Send SMS*/
     public static String table_SendSMS = "SendSMS";
+    public static String sendSMS_localID ="id";
     public static String sendSMS_toNumber ="toNumber";
     public static String sendSMS_text ="text";
     public static String sendSMS_smsID ="smsID";

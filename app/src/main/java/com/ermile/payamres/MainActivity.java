@@ -1,20 +1,13 @@
 package com.ermile.payamres;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.provider.Telephony;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -37,26 +30,29 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.ermile.payamres.CrateJSON.json_crated;
+import com.ermile.payamres.item.arraySchool;
+import com.ermile.payamres.item.school;
+import com.ermile.payamres.item.techer;
 import com.ermile.payamres.network.AppContoroler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
+import com.google.gson.Gson;
+
 public class MainActivity extends AppCompatActivity {
-
-    Context context;
-
     String TAG = "MainActivity";
-    public String phone_evazzadeh = "+989357269759";
     String model = Build.MODEL;
-
 
     /*sms App Key For API*/
     String smsappkey = prival.keyapp;
@@ -64,10 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
     /*On & Off Seystem*/
     boolean servic_smsAI = false;
-
-    /*URL JSON*/
-    String link_status = "https://khadije.com/api/v6/smsapp/status";
-    String link_dashboard = "https://khadije.com/api/v6/smsapp/dashboard";
 
     /*My value*/
     RelativeLayout Layout_ActivityMain;
@@ -77,19 +69,7 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout Refresh_json;
 
     String noNull = null;
-
-
-    String day_send = "";
-    String day_receive = "";
-
-    String week_send = "";
-    String week_receive = "";
-
-    String month_send = "";
-    String month_receive = "";
-
-    String total_send = "";
-    String total_receive = "";
+    String day_send ,day_receive ,week_send , week_receive ,month_send , month_receive ,total_send ,total_receive;
 
 
     @Override
@@ -121,6 +101,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        json_crated JsonCrated = new json_crated(getApplicationContext());
+        String JsonDatabase = JsonCrated.JsonApp(getApplicationContext());
+
+        alertDialog("Json: ",JsonDatabase,"ok",false);
+
+
+        /*techer testgson = new techer("amin","09195191387");
+        school schoolGson = new school("MalekZadeh","Mele",testgson);
+        List<arraySchool> arraySchools = new ArrayList<>();
+        for (int i = 0; i <100; i++) {
+            arraySchools.add(new arraySchool(i + "", "amin " + i));
+            schoolGson.setArraySchoolList(arraySchools);
+        }
+        Gson gson = new Gson();
+        Log.i("DatabaseToJSON", ""+gson.toJson(schoolGson));*/
+
 
         /*Get save_user*/
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
@@ -243,11 +240,11 @@ public class MainActivity extends AppCompatActivity {
     /*Off and On system*/
     public void SET_STATUS(){
         /*Get Number Phone */
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
+        final SharedPreferences save_userSHP = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+        final Boolean has_number = save_userSHP.getBoolean("has_number", false);
+        final String number_phone = save_userSHP.getString("number_phone", null);
         if (has_number && number_phone != null){
-            StringRequest post_user_add = new StringRequest(Request.Method.POST, link_status,
+            StringRequest post_user_add = new StringRequest(Request.Method.POST, save_user.link_status,
                     new Response.Listener<String>(){
                         @Override
                         public void onResponse(String response) {
@@ -337,12 +334,12 @@ public class MainActivity extends AppCompatActivity {
         GIFs = findViewById(R.id.GIFs);
         Refresh_json = findViewById(R.id.Refresh_json);
         /*Get Number Phone */
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
+        final SharedPreferences save_userSHP = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+        final SharedPreferences.Editor SaveUser_editor = save_userSHP.edit();
+        final Boolean has_number = save_userSHP.getBoolean("has_number", false);
+        final String number_phone = save_userSHP.getString("number_phone", null);
         /*Json*/
-        StringRequest post_user_add = new StringRequest(Request.Method.POST, link_dashboard,
+        StringRequest post_user_add = new StringRequest(Request.Method.POST, save_user.link_dashboard,
                 new Response.Listener<String>(){
                     @Override
                     public void onResponse(String response) {
@@ -474,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone_evazzadeh, null, "Payamres "+pInfo.versionName+"\n"+model, null, null);
+            smsManager.sendTextMessage(save_user.phone_evazzadeh, null, "Payamres "+pInfo.versionName+"\n"+model, null, null);
             Log.i(TAG , "SendSMS_Tester for phone_evazzadeh");
         } catch (Exception e) {
             Log.i(TAG, "No Send");
@@ -492,6 +489,30 @@ public class MainActivity extends AppCompatActivity {
     public void stopService() {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
+    }
+
+
+    /** Oder Method (No Used)*/
+    private void alertDialog(String title, final String desc, String btnTitle, boolean Cancelable){
+        final AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        /*Title*/
+        builderSingle.setTitle(title);
+        /*Message*/
+        builderSingle.setMessage(desc);
+        /*Button*/
+        builderSingle.setPositiveButton(btnTitle,
+                /*Open Url*/
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("text/plain");
+                        shareIntent.putExtra(Intent.EXTRA_TEXT,desc);
+                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "The title");
+                        startActivity(Intent.createChooser(shareIntent, "Share..."));
+                    }
+                });
+        builderSingle.setCancelable(Cancelable);
+        builderSingle.show();
     }
 
 }
