@@ -1,12 +1,15 @@
 package com.ermile.payamres;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -30,9 +33,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.ermile.payamres.Function.DetabaseToJson.ProducerJSON;
-import com.ermile.payamres.Function.ForegroundService;
-import com.ermile.payamres.Function.SaveDataUser.save_user;
+import com.ermile.payamres.Function.ForegroundServic.ForegroundService;
 import com.ermile.payamres.Static.Network.AppContoroler;
 import com.ermile.payamres.Function.SaveDataUser.prival;
 import com.ermile.payamres.Static.av;
@@ -99,10 +100,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ProducerJSON producer_JSON = new ProducerJSON(getApplicationContext());
-        String textJsonDatabaseSMS = producer_JSON.Producer(getApplicationContext());
 
-        alertDialog("Json: ",textJsonDatabaseSMS,"Share",false);
 
 
         /*Get save_user*/
@@ -499,6 +497,21 @@ public class MainActivity extends AppCompatActivity {
                 });
         builderSingle.setCancelable(Cancelable);
         builderSingle.show();
+    }
+
+
+    public void GetSmsFromDevice(){
+        Uri myMessage = Uri.parse("content://sms/");
+        ContentResolver cr = getContentResolver();
+        Cursor c = cr.query(myMessage, new String[] { "_id", "address", "date", "body","read" },null, null, null);
+        while (c.moveToNext()){
+            String Number = c.getString(c.getColumnIndexOrThrow("address")).toString();
+            String ReadStatus = c.getString(c.getColumnIndex("read"));
+            String Body = c.getString(c.getColumnIndexOrThrow("body")).toString();
+
+            Log.d("SmsDataBaseDevice", "Number: "+Number+"\n ReadStatus: "+ReadStatus+"\n Body: "+Body);
+        }
+        c.close();
     }
 
 }

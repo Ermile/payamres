@@ -43,7 +43,7 @@
         </receiver>
         <!--Service-->
         <service
-            android:name=".Function.ForegroundService"
+            android:name=".Function.ForegroundServic.ForegroundService"
             android:enabled="true"
             android:exported="true"
             tools:ignore="ExportedService">

@@ -1,4 +1,4 @@
-package com.ermile.payamres.Function;
+package com.ermile.payamres.Function.ForegroundServic;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -22,10 +22,19 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.ermile.payamres.Function.AsyncTask.Async_queue;
+import com.ermile.payamres.Function.AsyncTask.Async_smsnewsaved;
+import com.ermile.payamres.Function.Database.DetabaseToJson.ProducerJSON;
+import com.ermile.payamres.Function.Database.insert.SnedSMS_insert;
+import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_queue;
+import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_smsnewsaved;
 import com.ermile.payamres.MainActivity;
 import com.ermile.payamres.R;
 import com.ermile.payamres.Static.Network.AppContoroler;
 import com.ermile.payamres.Function.SaveDataUser.prival;
+import com.ermile.payamres.Static.av;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +75,7 @@ public class ForegroundService extends Service {
             Log.d(TAG, "run LastSMSSending ,"+" power Service is : "+powerServic);
             if (powerServic){
                 /*Run Send SMS*/
-                NewSMSSending(getBaseContext());
+                SyncSmsToServer(getBaseContext());
                 handler.postDelayed(runnable, 10000);
             }
         }
@@ -136,48 +145,88 @@ public class ForegroundService extends Service {
         }
     }
 
-    /*New SMS for Sending*/
-    public void NewSMSSending(final Context context_NewSMSSending){
+
+    private void SyncSmsToServer(final Context context){
+        ProducerJSON producer_JSON = new ProducerJSON(context);
+        final String textJsonDatabaseSMS = producer_JSON.Producer(context);
         /*Get Number Phone */
-        final SharedPreferences save_user = context_NewSMSSending.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
+        final SharedPreferences save_user = context.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
         final Boolean has_number = save_user.getBoolean("has_number", false);
         final String number_phone = save_user.getString("number_phone", null);
         if (has_number && number_phone != null){
-            StringRequest post_NewSMSSending = new StringRequest(Request.Method.POST, link_newSMS,
+            StringRequest post_NewSMSSending = new StringRequest(Request.Method.POST, av.url_Sync,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             try {
                                 JSONObject mainObject = new JSONObject(response);
-                                /*if sending from database is ok > Delete data from database*/
-                                Boolean ok_dashboard = mainObject.getBoolean("ok");
-                                if (ok_dashboard) {
-                                    if (!mainObject.isNull("result")){
-                                        JSONArray result = mainObject.getJSONArray("result");
-                                        for (int newM = 0; newM <= result.length(); newM++) {
-                                            JSONObject getsms_Forsend = result.getJSONObject(newM);
-                                            id_smsForSend = null;
-                                            if(!getsms_Forsend.isNull("id")){
-                                                id_smsForSend = getsms_Forsend.getString("id");
-                                                String smsto = getsms_Forsend.getString("fromnumber");
-                                                String sms_text = getsms_Forsend.getString("answertext");
-                                                try {
-                                                    SmsManager smsManager = SmsManager.getDefault();
-                                                    smsManager.sendTextMessage(smsto, null, sms_text, null, null);
-                                                    Log.i(TAG , "last sms > ok true > send sms");
-                                                    new TaskIntro().execute(id_smsForSend);
-                                                    Log.i(TAG ,"id is "+id_smsForSend);
+                                    JSONObject result = mainObject.getJSONObject("result");
+                                        JSONObject status = result.getJSONObject("status");
+                                        JSONObject dashboard = result.getJSONObject("dashboard");
+                                            JSONObject day = dashboard.getJSONObject("day");
+                                                String sendTody = day.getString("send");
+                                                String receiveTody = day.getString("receive");
+                                                String dateTody = day.getString("date");
+                                                /*Set ForgroundServic*/
+                                                updateNotifForground(dateTody,sendTody,receiveTody);
 
-                                                } catch (Exception e) {
-                                                    Log.i(TAG ,"No Send");
-                                                }
-                                            }
-                                        }
-                                    }else {
-                                        Log.i(TAG , "new sms > no sms for send :)");
+                                /* Update GetSMS */
+                                JSONArray smsNewSaved = result.getJSONArray("smsnewsaved");
+                                for (int i = 0; i < smsNewSaved.length(); i++) {
+                                    String localID,smsID,ServerID = null;
+                                    JSONObject objectArray =  smsNewSaved.getJSONObject(i);
+
+                                    if (!objectArray.isNull("localid") ||
+                                            !objectArray.isNull("smsid")||
+                                            !objectArray.isNull("serverid"))
+                                    {
+                                        localID = objectArray.getString("localid");
+                                        smsID = objectArray.getString("smsid");
+                                        ServerID = objectArray.getString("serverid");
+
+                                        item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,ServerID);
+                                        new Async_smsnewsaved(context).execute(param_smsnewsaved);
+                                    }
+                                }
+                                /* New SMS */
+                                JSONArray queue = result.getJSONArray("queue");
+                                for (int i = 0; i < queue.length(); i++) {
+                                    String toNumber,text,ServerID = null;
+                                    JSONObject objectArray =  queue.getJSONObject(i);
+
+                                    if (!objectArray.isNull("togateway") ||
+                                            !objectArray.isNull("text")||
+                                            !objectArray.isNull("id"))
+                                    {
+                                        toNumber = objectArray.getString("togateway") ;
+                                        text = objectArray.getString("text");
+                                        ServerID = objectArray.getString("id");
+
+                                        item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
+                                        new Async_queue(context).execute(param_itemQueu);
+                                    }
+                                }
+
+                                /* Update SendSMS */
+                                JSONArray sentSmsSaved = result.getJSONArray("sentsmssaved");
+                                for (int i = 0; i < sentSmsSaved.length(); i++) {
+                                    String smsid,localid,serverid,status_sent;
+                                    JSONObject objectArray =  sentSmsSaved.getJSONObject(i);
+
+                                    if (!objectArray.isNull("smsid") ||
+                                            !objectArray.isNull("localid") ||
+                                            !objectArray.isNull("serverid") ||
+                                            !objectArray.isNull("status"))
+                                    {
+
+
                                     }
 
                                 }
+
+
+
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -185,22 +234,32 @@ public class ForegroundService extends Service {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.i(TAG , "new sms > error");
+                    Log.e(TAG , "new sms > error");
                 }
             }) {
                 @Override
                 public Map<String, String> getHeaders() {
-                    HashMap<String, String> newsms_headers = new HashMap<>();
-                    newsms_headers.put("smsappkey", prival.keyapp);
-                    newsms_headers.put("gateway", number_phone);
-                    Log.i(TAG , "Send Header");
-                    return newsms_headers;
+                    HashMap<String, String> header = new HashMap<>();
+                    header.put("smsappkey", prival.keyapp);
+                    header.put("gateway", number_phone);
+                    Log.d(TAG , "Send Header");
+                    return header;
+                }
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> body = new HashMap<>();
+                    body.put("", textJsonDatabaseSMS );
+                    Log.d(TAG , "Send Body");
+                    Log.i(TAG , "Send Body JSON > "+textJsonDatabaseSMS);
+                    return body;
                 }
             };
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }
-
     }
+
+
 
     /*SMS Sent*/
     public class TaskIntro extends AsyncTask< String, String , String> {
@@ -261,6 +320,7 @@ public class ForegroundService extends Service {
             return null;
         }
     }
+
 
     private void updateNotifForground(String dayDesc,String SendSMS, String ReceiveSMS){
         /*Update Notify Text*/
