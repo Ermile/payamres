@@ -3,6 +3,8 @@ package com.ermile.payamres.Function.AsyncTask;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.ermile.payamres.Function.Database.Select.SendSMS_Select;
 import com.ermile.payamres.Function.Database.Update.GetSMS_update;
 import com.ermile.payamres.Function.Database.insert.SnedSMS_insert;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_queue;
@@ -44,9 +46,14 @@ public class Async_queue extends AsyncTask<item_queue, Void , Void> {
                 String group_id = p.getGroup_id() ;
                 String recommend_id = p.getRecommend_id() ;
 
-                SnedSMS_insert insert = new SnedSMS_insert(context);
-                insert.insertToSendSMS(context,togateway,text,null,"false","false",id);
-                Log.d(av.TagAsync, "Async_queue (doInBackground): "+ togateway + " | " + text + " | " + id );
+                boolean idIsNew = new SendSMS_Select(context).getServerID(context,id);
+                if (idIsNew){
+                    SnedSMS_insert insert = new SnedSMS_insert(context);
+                    insert.insertToSendSMS(context,togateway,text,null,"false","false",id);
+                    Log.d(av.TagAsync, "Async_queue (doInBackground): "+ togateway + " | " + text + " | " + id );
+                }else {
+                    Log.e(av.TagAsync, "Async_queue (doInBackground): ServerID Not! NEW");
+                }
 
             } catch (Exception error) {
                 Log.e(av.TagAsync, "Async_queue (doInBackground): " + error, null);

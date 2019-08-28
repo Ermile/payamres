@@ -25,7 +25,6 @@ public class ProducerJSON {
 
     public ProducerJSON(Context context) {
         this.context = context;
-        Producer(context);
     }
 
     public String Producer(Context context){
@@ -35,7 +34,7 @@ public class ProducerJSON {
             GetSMS_Send(context,mJson);
 
             Gson gson = new Gson();
-            Log.i(av.pTag, "JSON > "+gson.toJson(mJson));
+            Log.i(av.pTag, "ProducerJSON.class > "+gson.toJson(mJson));
             return gson.toJson(mJson);
 
         }catch (Exception error){
@@ -87,7 +86,11 @@ public class ProducerJSON {
             List<sentsms_jsonArray> smsSent = new ArrayList<>();
 
             SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
-            Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_SendSMS+" WHERE "+DatabaseSMS.sendSMS_isSendToUser +" = 'true' ", null);
+            Cursor infoDatabaseSMS = smsDatabase.rawQuery(
+                    "SELECT * FROM "+DatabaseSMS.table_SendSMS+" WHERE "
+                    +DatabaseSMS.sendSMS_isSendToUser +" = 'true' "
+                    + "AND "+DatabaseSMS.sendSMS_isSendToServer +" = 'false'", null);
+
             while (infoDatabaseSMS.moveToNext()) {
                 String id,smsID,serverID = null;
                 id = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
