@@ -26,12 +26,11 @@ public class Async_sentsmssaved extends AsyncTask<item_sentsmssaved, Void , Void
     @Override
     protected Void doInBackground(item_sentsmssaved... params) {
         for (item_sentsmssaved p : params) {
+            String Localid = p.getLocalid();
+            String Smsid = p.getSmsid();
+            String Serverid = p.getServerid();
+            String isSendToServer = p.getStatus();
             try {
-                String Localid = p.getLocalid();
-                String Smsid = p.getSmsid();
-                String Serverid = p.getServerid();
-                String isSendToServer = p.getStatus();
-
                 SendSMS_update update = new SendSMS_update(context);
                 update.SendToServer(context, Localid, Smsid, Serverid,isSendToServer);
                 Log.d(av.TagAsync, "Async_SentSmsSaved (doInBackground): "+ Localid + " | " + Smsid+ " | " + Serverid );

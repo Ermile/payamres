@@ -7,6 +7,10 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,10 +23,13 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.ermile.payamres.Function.AsyncTask.Async_SendDevice;
 import com.ermile.payamres.Function.AsyncTask.Async_queue;
 import com.ermile.payamres.Function.AsyncTask.Async_sentsmssaved;
 import com.ermile.payamres.Function.AsyncTask.Async_smsnewsaved;
+import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ProducerJSON;
+import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.itemSendDevice;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_queue;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_sentsmssaved;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_smsnewsaved;
@@ -224,6 +231,7 @@ public class ForegroundService extends Service {
                                         new Async_sentsmssaved(context).execute(param_SentSmsSaved);
                                     }
                                 }
+                                SendSmsToUser(context);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -262,6 +270,28 @@ public class ForegroundService extends Service {
             };
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }
+    }
+
+
+    private void SendSmsToUser(Context context ){
+        SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+
+        Cursor getSendSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_SendSMS + " WHERE "+DatabaseSMS.sendSMS_isSendToUser+ " = 'false' ", null);
+        while (getSendSMS.moveToNext()){
+            String id,number,massage,smsID,serverID;
+            id = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
+            number = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_toNumber)) ;
+            massage = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_text)) ;
+            smsID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_smsID)) ;
+            serverID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
+
+            Log.d(TAG, "SendSmsToUser: "+id+" | "+number+" | "+massage+" | "+smsID+" | "+serverID);
+
+            itemSendDevice itemSend_Device= new itemSendDevice(id,number,massage,smsID,serverID);
+            new Async_SendDevice(context).execute(itemSend_Device);
+
+        }
+
     }
 
 

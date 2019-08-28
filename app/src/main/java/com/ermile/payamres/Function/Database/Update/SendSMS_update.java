@@ -18,8 +18,23 @@ public class SendSMS_update {
         Log.d(av.TagUpdateDatabase, "SendSMS_update (isSendToServer):  "+localID +" | "+smsID + " | "+serverID + " | "+isSendToServer);
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
-        String query = "UPDATE "+ DatabaseSMS.table_GetSMS +
+        String query = "UPDATE "+ DatabaseSMS.table_SendSMS +
                 " SET isSendToServer = " + " ' " + isSendToServer +" ' "+
+                "WHERE id = ' " + localID + " ' " +
+                "AND smsID = ' " + smsID + "' " +
+                "AND serverID = ' " + serverID + "' ";
+        Log.i(av.TagUpdateDatabase, "SendSMS_update (isSendToServer): "+query);
+
+        smsDatabase.execSQL(query);
+        smsDatabase.close();
+    }
+
+    public void SendToUser(Context context,String localID,String smsID,String serverID,String isSendToUser){
+        Log.d(av.TagUpdateDatabase, "SendSMS_update (isSendToUser):  "+localID +" | "+smsID + " | "+serverID + " | "+isSendToUser);
+
+        SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+        String query = "UPDATE "+ DatabaseSMS.table_GetSMS +
+                " SET isSendToServer = " + " ' " + isSendToUser +" ' "+
                 "WHERE id = ' " + localID + " ' " +
                 "AND smsID = ' " + smsID + "' " +
                 "AND serverID = ' " + serverID + "' ";
