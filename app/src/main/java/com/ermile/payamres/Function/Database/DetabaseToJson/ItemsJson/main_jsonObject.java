@@ -5,16 +5,15 @@ import java.util.List;
 public class main_jsonObject {
     boolean status;
     detail_jsonObject detail;
-    List<smsnew_jsonArray> smsNew;
-    List<sentsms_jsonArray> smsSent;
+    List<smsnew_jsonArray> smsnew;
+    List<sentsms_jsonArray> sentsms;
 
     public main_jsonObject(boolean status, detail_jsonObject detail) {
         this.status = status;
         this.detail = detail;
-        this.smsNew = smsNew;
-        this.smsSent = smsSent;
+        this.smsnew = smsnew;
+        this.sentsms = sentsms;
     }
-
 
     public boolean isStatus() {
         return status;
@@ -32,19 +31,19 @@ public class main_jsonObject {
         this.detail = detail;
     }
 
-    public List<smsnew_jsonArray> getSmsNew() {
-        return smsNew;
+    public List<smsnew_jsonArray> getSmsnew() {
+        return smsnew;
     }
 
-    public void setSmsNew(List<smsnew_jsonArray> smsNew) {
-        this.smsNew = smsNew;
+    public void setSmsnew(List<smsnew_jsonArray> smsnew) {
+        this.smsnew = smsnew;
     }
 
-    public List<sentsms_jsonArray> getSmsSent() {
-        return smsSent;
+    public List<sentsms_jsonArray> getSentsms() {
+        return sentsms;
     }
 
-    public void setSmsSent(List<sentsms_jsonArray> smsSent) {
-        this.smsSent = smsSent;
+    public void setSentsms(List<sentsms_jsonArray> sentsms) {
+        this.sentsms = sentsms;
     }
 }
