@@ -177,60 +177,87 @@ public class ForegroundService extends Service {
                                 updateNotifForground(dateTody,sendTody,receiveTody);
 
                                 /* Update GetSMS */
-                                JSONArray smsNewSaved = result.getJSONArray("smsnewsaved");
-                                for (int i = 0; i < smsNewSaved.length(); i++) {
-                                    String localID,smsID,ServerID = null;
-                                    JSONObject objectArray =  smsNewSaved.getJSONObject(i);
-                                    if (!objectArray.isNull("localid") ||
-                                            !objectArray.isNull("smsid")||
-                                            !objectArray.isNull("serverid"))
-                                    {
-                                        localID = objectArray.getString("localid");
-                                        smsID = objectArray.getString("smsid");
-                                        ServerID = objectArray.getString("serverid");
+                                if(!result.isNull("smsnewsaved")){
+                                    JSONArray smsNewSaved = result.getJSONArray("smsnewsaved");
+                                    for (int i = 0; i < smsNewSaved.length(); i++) {
+                                        String localID,smsID,ServerID = null;
+                                        JSONObject objectArray =  smsNewSaved.getJSONObject(i);
+                                        if (!objectArray.isNull("localid") ||
+                                                !objectArray.isNull("smsid")||
+                                                !objectArray.isNull("serverid"))
+                                        {
+                                            localID = objectArray.getString("localid");
+                                            smsID = objectArray.getString("smsid");
+                                            ServerID = objectArray.getString("serverid");
 
-                                        item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,ServerID);
-                                        new Async_smsnewsaved(context).execute(param_smsnewsaved);
+                                            item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,ServerID);
+                                            new Async_smsnewsaved(context).execute(param_smsnewsaved);
+                                        }
                                     }
                                 }
+
                                 /* New SMS */
-                                JSONArray queue = result.getJSONArray("notsent");
-                                for (int i = 0; i < queue.length(); i++) {
-                                    String toNumber,text,ServerID = null;
-                                    JSONObject objectArray =  queue.getJSONObject(i);
+                                if (!result.isNull("queue")){
+                                    JSONArray queue = result.getJSONArray("queue");
+                                    for (int i = 0; i < queue.length(); i++) {
+                                        String toNumber,text,ServerID = null;
+                                        JSONObject objectArray =  queue.getJSONObject(i);
 
-                                    if (!objectArray.isNull("togateway") ||
-                                            !objectArray.isNull("answertext")||
-                                            !objectArray.isNull("id"))
-                                    {
-                                        toNumber = objectArray.getString("togateway") ;
-                                        text = objectArray.getString("answertext");
-                                        ServerID = objectArray.getString("id");
+                                        if (!objectArray.isNull("togateway") ||
+                                                !objectArray.isNull("answertext")||
+                                                !objectArray.isNull("id"))
+                                        {
+                                            toNumber = objectArray.getString("togateway") ;
+                                            text = objectArray.getString("answertext");
+                                            ServerID = objectArray.getString("id");
 
-                                        item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
-                                        new Async_queue(context).execute(param_itemQueu);
+                                            item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
+                                            new Async_queue(context).execute(param_itemQueu);
+                                        }
+                                    }
+                                }else if (!result.isNull("notsent")){
+                                    JSONArray queue = result.getJSONArray("notsent");
+                                    for (int i = 0; i < queue.length(); i++) {
+                                        String toNumber,text,ServerID = null;
+                                        JSONObject objectArray =  queue.getJSONObject(i);
+
+                                        if (!objectArray.isNull("togateway") ||
+                                                !objectArray.isNull("answertext")||
+                                                !objectArray.isNull("id"))
+                                        {
+                                            toNumber = objectArray.getString("togateway") ;
+                                            text = objectArray.getString("answertext");
+                                            ServerID = objectArray.getString("id");
+
+                                            item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
+                                            new Async_queue(context).execute(param_itemQueu);
+                                        }
                                     }
                                 }
+
                                 /* Update SendSMS */
-                                JSONArray sentSmsSaved = result.getJSONArray("sentsmssaved");
-                                for (int i = 0; i < sentSmsSaved.length(); i++) {
-                                    String smsid,localid,serverid,status_sent;
-                                    JSONObject objectArray =  sentSmsSaved.getJSONObject(i);
+                                if (!result.isNull("sentsmssaved")){
+                                    JSONArray sentSmsSaved = result.getJSONArray("sentsmssaved");
+                                    for (int i = 0; i < sentSmsSaved.length(); i++) {
+                                        String smsid,localid,serverid,status_sent;
+                                        JSONObject objectArray =  sentSmsSaved.getJSONObject(i);
 
-                                    if (!objectArray.isNull("smsid") ||
-                                            !objectArray.isNull("localid") ||
-                                            !objectArray.isNull("serverid") ||
-                                            !objectArray.isNull("status"))
-                                    {
-                                        smsid = objectArray.getString("smsid");
-                                        localid = objectArray.getString("localid") ;
-                                        serverid = objectArray.getString("serverid") ;
-                                        status_sent = objectArray.getString("status") ;
+                                        if (!objectArray.isNull("smsid") ||
+                                                !objectArray.isNull("localid") ||
+                                                !objectArray.isNull("serverid") ||
+                                                !objectArray.isNull("status"))
+                                        {
+                                            smsid = objectArray.getString("smsid");
+                                            localid = objectArray.getString("localid") ;
+                                            serverid = objectArray.getString("serverid") ;
+                                            status_sent = objectArray.getString("status") ;
 
-                                        item_sentsmssaved param_SentSmsSaved = new item_sentsmssaved(smsid,localid,serverid,status_sent);
-                                        new Async_sentsmssaved(context).execute(param_SentSmsSaved);
+                                            item_sentsmssaved param_SentSmsSaved = new item_sentsmssaved(smsid,localid,serverid,status_sent);
+                                            new Async_sentsmssaved(context).execute(param_SentSmsSaved);
+                                        }
                                     }
                                 }
+
                                 SendSmsToUser(context);
                             } catch (JSONException e) {
                                 e.printStackTrace();

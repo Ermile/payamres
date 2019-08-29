@@ -34,10 +34,10 @@ public class SendSMS_update {
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
         String query = "UPDATE "+ DatabaseSMS.table_GetSMS +
-                " SET isSendToServer = " + " ' " + isSendToUser +" ' "+
-                "WHERE id = ' " + localID + " ' " +
-                "AND smsID = ' " + smsID + "' " +
-                "AND serverID = ' " + serverID + "' ";
+                " SET isSendToUser = " + "'" + isSendToUser +"'"+
+                " WHERE id = '" + localID + "'" +
+                " AND smsID = '" + smsID + "'" +
+                " AND serverID = '" + serverID + "'";
         Log.i(av.TagUpdateDatabase, "SendSMS_update (isSendToServer): "+query);
 
         smsDatabase.execSQL(query);

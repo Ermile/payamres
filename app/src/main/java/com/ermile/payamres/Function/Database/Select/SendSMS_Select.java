@@ -24,7 +24,7 @@ public class SendSMS_Select {
         Log.d(av.tagQuery, "query getServerID (SendSMS): "+getID);
         while (getID.moveToNext()){
            String id = getID.getString(getID.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
-            Log.d(av.iTag, "getServerID (SendSMS): "+id);
+            Log.d(av.pTag, "getServerID (SendSMS): "+id);
             return false;
         }
         return true;

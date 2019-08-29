@@ -11,6 +11,8 @@ import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.itemSendDevic
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_IsSendToUser;
 import com.ermile.payamres.Static.av;
 
+import java.util.Random;
+
 public class Async_SendDevice extends AsyncTask<itemSendDevice, Void , Void> {
 
     Context context;
@@ -34,6 +36,10 @@ public class Async_SendDevice extends AsyncTask<itemSendDevice, Void , Void> {
             String smsID = p.getSmsID();
             String serverID = p.getServerID();
             try {
+                Random random = new Random();
+                int timeSleep = random.nextInt(1000-5000);
+                Log.d(av.iTag, "SendDevice SMS > .sleep ("+timeSleep+") sec");
+                Thread.sleep(timeSleep);
                 SmsManager smsManager = SmsManager.getDefault();
                 smsManager.sendTextMessage(number, null,  massage, null, null);
                 item_IsSendToUser itemIsSendToUser = new item_IsSendToUser(smsID,localID,serverID,"true");
