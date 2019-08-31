@@ -37,7 +37,7 @@ public class SendSMS_update {
                 " WHERE id = '" + localID + "'" +
                 " AND smsID = '" + smsID + "'" +
                 " AND serverID = '" + serverID + "'";
-        Log.i(av.tag_SendSMS, "B 9- Update Table SendSMS isSendToUser \n Query is: "+query);
+        Log.i(av.tag_SendSMS, "B 7- Update isSendToUser = true \n Query is: "+query);
 
         smsDatabase.execSQL(query);
         smsDatabase.close();

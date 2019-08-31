@@ -7,10 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,22 +14,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.ermile.payamres.Function.AsyncTask.Async_SendDevice;
 import com.ermile.payamres.Function.AsyncTask.Async_queue;
 import com.ermile.payamres.Function.AsyncTask.Async_sentsmssaved;
 import com.ermile.payamres.Function.AsyncTask.Async_smsnewsaved;
-import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ProducerJSON;
-import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.itemSendDevice;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_queue;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_sentsmssaved;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_smsnewsaved;
 import com.ermile.payamres.Function.SaveDataUser.prival;
+import com.ermile.payamres.Function.SendSMSToUser;
 import com.ermile.payamres.MainActivity;
 import com.ermile.payamres.R;
 import com.ermile.payamres.Static.Network.AppContoroler;
@@ -44,7 +39,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -152,6 +146,7 @@ public class ForegroundService extends Service {
 
 
     private void SyncSmsToServer(final Context context){
+        new SendSMSToUser(context).execute("1");
         final String textJsonDatabaseSMS = new ProducerJSON(context).Producer(context);
         /*Get Number Phone */
         final SharedPreferences save_user = context.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);

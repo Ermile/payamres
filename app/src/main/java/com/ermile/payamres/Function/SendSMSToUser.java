@@ -3,38 +3,67 @@ package com.ermile.payamres.Function;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.telephony.SmsManager;
 import android.util.Log;
 
-import com.ermile.payamres.Function.AsyncTask.Async_SendDevice;
 import com.ermile.payamres.Function.Database.DatabaseSMS;
-import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.itemSendDevice;
+import com.ermile.payamres.Function.Database.Update.SendSMS_update;
 import com.ermile.payamres.Static.av;
 
-public class SendSMSToUser {
+import java.util.Random;
+
+public class SendSMSToUser extends AsyncTask<String, Void , Void> {
 
     Context context;
 
     public SendSMSToUser(Context context) {
         this.context = context;
-
-        SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
-        Cursor getSendSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_SendSMS + " WHERE "+DatabaseSMS.sendSMS_isSendToUser+ " = 'false' ", null);
-        Log.i(av.tag_SendSMS, "B 4- Get Table 'SendSMS' --> if (isSendToUser = false)");
-        while (getSendSMS.moveToNext()){
-            String id,number,massage,smsID,serverID;
-            id = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
-            number = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_toNumber)) ;
-            massage = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_text)) ;
-            smsID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_smsID)) ;
-            serverID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
-
-            itemSendDevice itemSend_Device= new itemSendDevice(id,number,massage,smsID,serverID);
-            Log.i(av.tag_SendSMS, "B 5- Start Async Send SMS To User \n"
-                    +"  "+id+"- "+number+" | "+massage.replace("\n"," ")+" | "+smsID+" | "+serverID);
-            new Async_SendDevice(context).execute(itemSend_Device);
-
-        }
     }
 
+
+    @Override
+    protected void onPreExecute() {
+    }
+
+    @Override
+    protected Void doInBackground(String... params) {
+        for (String p : params) {
+            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+            String query =  "SELECT * FROM "+DatabaseSMS.table_SendSMS
+                    + " WHERE "+DatabaseSMS.sendSMS_isSendToUser+ " = 'false' ";
+            Cursor getSendSMS = smsDatabase.rawQuery(query, null);
+            Log.i(av.tag_SendSMS, "B 4- Get Table 'SendSMS' count: "+getSendSMS.getCount()
+                    +" --> if (isSendToUser = false)"
+                    +"\n Query: "+query);
+            SendSMS_update update = new SendSMS_update(context);
+            while (getSendSMS.moveToNext()){
+                String id,number,massage,smsID,serverID;
+                id = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
+                number = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_toNumber)) ;
+                massage = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_text)) ;
+                smsID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_smsID)) ;
+                serverID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
+                try {
+                    int timeSleep = new Random().nextInt((av.max_SendSMS - av.min_SendSMS))+ av.min_SendSMS;
+                    Thread.sleep(timeSleep);
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(number, null,  massage, null, null);
+                    Log.i(av.tag_SendSMS, "B 5- Send SMS To User \n"
+                            +"number: "+number +" | Massage: "+massage.replace("\n"," ")+" Sleep Code "+timeSleep+" MilSec");
+
+                    update.SendToUser(context,id,smsID,serverID,"true");
+                    Log.i(av.tag_SendSMS, "B 6- start Function Update for (Update Table SendSMS 'isSendToUser = true') \n"
+                            +"Id: "+id+" | Smsid: "+smsID+" | Serverid: "+serverID+" | isSendToUser: 'true' ");
+
+                } catch (Exception e) {
+                    update.SendToUser(context,id,smsID,serverID,"false");
+                    Log.e(av.tag_SendSMS, "B 5- Send SMS To User \n ERROR > "+e);
+                }
+
+            }
+        }
+        return null;
+    }
 
 }

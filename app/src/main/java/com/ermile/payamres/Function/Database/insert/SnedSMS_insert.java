@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.ermile.payamres.Function.Database.DatabaseSMS;
-import com.ermile.payamres.Function.SendSMSToUser;
 import com.ermile.payamres.Static.av;
 
 public class SnedSMS_insert {
@@ -38,7 +37,5 @@ public class SnedSMS_insert {
 
         smsDatabase.execSQL(query);
         smsDatabase.close();
-
-        new SendSMSToUser(context);
     }
 }
