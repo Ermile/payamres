@@ -30,14 +30,15 @@ public class Async_SendToUser extends AsyncTask<item_IsSendToUser, Void , Void> 
             String Localid = p.getLocalid();
             String Smsid = p.getSmsid();
             String Serverid = p.getServerid();
-            String isSendToServer = p.getIsSendToUser();
+            String isSendToUser = p.getIsSendToUser();
             SendSMS_update update = new SendSMS_update(context);
             try {
-                update.SendToUser(context,Localid,Smsid,Serverid,isSendToServer);
-                Log.i(av.TagAsync , "SMS Send To User ToNumber");
+                update.SendToUser(context,Localid,Smsid,Serverid,isSendToUser);
+                Log.i(av.tag_SendSMS, "B 8- start Function Update for (Update Table SendSMS 'isSendToUser = true') \n"
+                        +"Id: "+Localid+" | Smsid: "+Smsid+" | Serverid: "+Serverid+" | isSendToUser: "+isSendToUser);
             } catch (Exception e) {
                 update.SendToUser(context,Localid,Smsid,Serverid,"false");
-                Log.i(av.TagAsync, "SMS Not! Send To User ToNumber");
+                Log.e(av.tag_SendSMS, "B 8- ERROR Function Update for (Update Table SendSMS 'isSendToUser = false') \n ERROR > "+e);
             }
 
         }

@@ -50,13 +50,14 @@ public class Async_queue extends AsyncTask<item_queue, Void , Void> {
                 if (idIsNew){
                     SnedSMS_insert insert = new SnedSMS_insert(context);
                     insert.insertToSendSMS(context,togateway,text,null,"false","false",id);
-                    Log.d(av.TagAsync, "Async_queue (doInBackground): "+ togateway + " | " + text + " | " + id );
+                    Log.i(av.tag_SendSMS, "A 2- Async_queue Start Function INSERT SMSNew To (Table SendSMS) \n"
+                            +"togateway: "+ togateway + " | text: " + text.replace("\n"," ") + " | id: " + id +" | isSendToUser & Server = false");
                 }else {
-                    Log.e(av.TagAsync, "Async_queue (doInBackground): ServerID Not! NEW");
+                    Log.e(av.tag_SendSMS, "A 2- SMS Is Not New > ServerID Not! NEW");
                 }
 
             } catch (Exception error) {
-                Log.e(av.TagAsync, "Async_queue (doInBackground): " + error, null);
+                Log.e(av.tag_SendSMS, "A 2- Async_queue ERROR \n > " + error, null);
             }
 
         }

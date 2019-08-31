@@ -30,15 +30,14 @@ public class SendSMS_update {
     }
 
     public void SendToUser(Context context,String localID,String smsID,String serverID,String isSendToUser){
-        Log.d(av.TagUpdateDatabase, "SendSMS_update (isSendToUser):  "+localID +" | "+smsID + " | "+serverID + " | "+isSendToUser);
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
-        String query = "UPDATE "+ DatabaseSMS.table_GetSMS +
+        String query = "UPDATE "+ DatabaseSMS.table_SendSMS +
                 " SET isSendToUser = " + "'" + isSendToUser +"'"+
                 " WHERE id = '" + localID + "'" +
                 " AND smsID = '" + smsID + "'" +
                 " AND serverID = '" + serverID + "'";
-        Log.i(av.TagUpdateDatabase, "SendSMS_update (isSendToServer): "+query);
+        Log.i(av.tag_SendSMS, "B 9- Update Table SendSMS isSendToUser \n Query is: "+query);
 
         smsDatabase.execSQL(query);
         smsDatabase.close();

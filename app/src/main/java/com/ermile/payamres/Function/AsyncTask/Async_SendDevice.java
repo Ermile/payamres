@@ -13,6 +13,10 @@ import com.ermile.payamres.Static.av;
 
 import java.util.Random;
 
+/**
+ * Run this Async but no crash & permission  in Send SMS
+ **/
+
 public class Async_SendDevice extends AsyncTask<itemSendDevice, Void , Void> {
 
     Context context;
@@ -24,7 +28,6 @@ public class Async_SendDevice extends AsyncTask<itemSendDevice, Void , Void> {
 
     @Override
     protected void onPreExecute() {
-        Log.d(av.TagAsync, "Start (Async_queue) \n");
     }
 
     @Override
@@ -37,18 +40,19 @@ public class Async_SendDevice extends AsyncTask<itemSendDevice, Void , Void> {
             String serverID = p.getServerID();
             try {
                 Random random = new Random();
-                int timeSleep = random.nextInt(1000-5000);
-                Log.d(av.iTag, "SendDevice SMS > .sleep ("+timeSleep+") sec");
+                int timeSleep = random.nextInt(1000+5000);
                 Thread.sleep(timeSleep);
                 SmsManager smsManager = SmsManager.getDefault();
                 smsManager.sendTextMessage(number, null,  massage, null, null);
+                Log.i(av.tag_SendSMS, "B 6- Send SMS To User \n"
+                        +"number: "+number +" | Massage: "+massage.replace("\n"," ")+" Sleep Code "+timeSleep+" MilSec");
                 item_IsSendToUser itemIsSendToUser = new item_IsSendToUser(smsID,localID,serverID,"true");
+                Log.i(av.tag_SendSMS, "B 7- start Async If SendToUser Update (Table SendSMS 'isSendToUser = true') ");
                 new Async_SendToUser(context).execute(itemIsSendToUser);
-                Log.i(av.TagAsync , "SendSMS ToNumber: "+number +" Massage: "+massage);
             } catch (Exception e) {
                 item_IsSendToUser itemIsSendToUser = new item_IsSendToUser(smsID,localID,serverID,"false");
                 new Async_SendToUser(context).execute(itemIsSendToUser);
-                Log.i(av.TagAsync, "No Send");
+                Log.e(av.tag_SendSMS, "B 6- Send SMS To User \n ERROR > "+e);
             }
 
         }

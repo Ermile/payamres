@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.ermile.payamres.Function.Database.DatabaseSMS;
+import com.ermile.payamres.Function.SendSMSToUser;
 import com.ermile.payamres.Static.av;
 
 public class SnedSMS_insert {
@@ -33,9 +34,11 @@ public class SnedSMS_insert {
                 + " '"+isSendToUser+"',"
                 + " '"+isSendToServer+"',"
                 + " '"+serverID+"' )";
-        Log.i(av.TagInsertDatabase, "insertToSendSMS query: "+ query);
+        Log.i(av.tag_SendSMS, "A 3- INSERT SMSNew To Table SendSMS \n Query: "+ query);
 
         smsDatabase.execSQL(query);
         smsDatabase.close();
+
+        new SendSMSToUser(context);
     }
 }

@@ -8,6 +8,8 @@ public class av {
     public static String TagAsync = "AsyncTaskPayamresApp";
     public static String TagUpdateDatabase = "TagUpdateDatabasePayamresApp";
     public static String TagInsertDatabase = "TagUpdateDatabasePayamresApp";
+    public static String tag_SendSMS = "tag_SendSMSDatabasePayamresApp";
+    public static String tag_GetSMS = "tag_GetSMSDatabasePayamresApp";
 
     public static String link_status = "https://khadije.com/api/v6/smsapp/status";
     public static String link_dashboard = "https://khadije.com/api/v6/smsapp/dashboard";

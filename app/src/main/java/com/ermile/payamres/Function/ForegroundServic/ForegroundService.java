@@ -81,7 +81,7 @@ public class ForegroundService extends Service {
             if (powerServic){
                 /*Run Send SMS*/
                 SyncSmsToServer(getApplicationContext());
-                handler.postDelayed(runnable, 10000);
+                handler.postDelayed(runnable, 30000);
             }
         }
     };
@@ -210,9 +210,11 @@ public class ForegroundService extends Service {
                                             toNumber = objectArray.getString("togateway") ;
                                             text = objectArray.getString("answertext");
                                             ServerID = objectArray.getString("id");
-
                                             item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
+                                            Log.i(av.tag_SendSMS, "A 1- (queue) Start Async Save SmsNew To 'Table SendSMS' > "+i+" \n "
+                                                    +"ServerID: "+ServerID+" toNumber: "+toNumber+" Massage: "+text.replace("\n"," "));
                                             new Async_queue(context).execute(param_itemQueu);
+
                                         }
                                     }
                                 }else if (!result.isNull("notsent")){
@@ -228,8 +230,9 @@ public class ForegroundService extends Service {
                                             toNumber = objectArray.getString("togateway") ;
                                             text = objectArray.getString("answertext");
                                             ServerID = objectArray.getString("id");
-
                                             item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
+                                            Log.i(av.tag_SendSMS, "A 1- (noSent) Start Async Save SmsNew To 'Table SendSMS' > "+i+" \n "
+                                                    +"ServerID: "+ServerID+" toNumber: "+toNumber+" Massage: "+text.replace("\n"," "));
                                             new Async_queue(context).execute(param_itemQueu);
                                         }
                                     }
@@ -257,8 +260,6 @@ public class ForegroundService extends Service {
                                         }
                                     }
                                 }
-
-                                SendSmsToUser(context);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -297,29 +298,10 @@ public class ForegroundService extends Service {
             };
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }
-    }
-
-
-    private void SendSmsToUser(Context context ){
-        SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
-
-        Cursor getSendSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_SendSMS + " WHERE "+DatabaseSMS.sendSMS_isSendToUser+ " = 'false' ", null);
-        while (getSendSMS.moveToNext()){
-            String id,number,massage,smsID,serverID;
-            id = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
-            number = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_toNumber)) ;
-            massage = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_text)) ;
-            smsID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_smsID)) ;
-            serverID = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
-
-            Log.d(TAG, "SendSmsToUser: "+id+" | "+number+" | "+massage+" | "+smsID+" | "+serverID);
-
-            itemSendDevice itemSend_Device= new itemSendDevice(id,number,massage,smsID,serverID);
-            new Async_SendDevice(context).execute(itemSend_Device);
-
-        }
 
     }
+
+
 
 
 
