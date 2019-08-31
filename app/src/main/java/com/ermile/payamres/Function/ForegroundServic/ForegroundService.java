@@ -75,7 +75,7 @@ public class ForegroundService extends Service {
             if (powerServic){
                 /*Run Send SMS*/
                 SyncSmsToServer(getApplicationContext());
-                handler.postDelayed(runnable, 30000);
+                handler.postDelayed(runnable, 60000);
             }
         }
     };
@@ -146,7 +146,6 @@ public class ForegroundService extends Service {
 
 
     private void SyncSmsToServer(final Context context){
-        new SendSMSToUser(context).execute("1");
         final String textJsonDatabaseSMS = new ProducerJSON(context).Producer(context);
         /*Get Number Phone */
         final SharedPreferences save_user = context.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
@@ -288,12 +287,14 @@ public class ForegroundService extends Service {
 
                 @Override
                 public String getBodyContentType() {
+                    Log.d(av.iTag, "getBodyContentType: "+ textJsonDatabaseSMS);
                     return "application/json";
                 }
             };
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }
 
+        new SendSMSToUser(context).execute("1");
     }
 
 

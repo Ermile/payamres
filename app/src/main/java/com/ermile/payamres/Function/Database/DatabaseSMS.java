@@ -30,7 +30,7 @@ public class DatabaseSMS extends SQLiteAssetHelper {
     public static String sendSMS_isSendToServer ="isSendToServer";
     public static String sendSMS_serverID ="serverID";
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 5;
 
     public DatabaseSMS(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

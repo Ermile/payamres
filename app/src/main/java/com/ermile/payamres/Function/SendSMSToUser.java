@@ -31,7 +31,7 @@ public class SendSMSToUser extends AsyncTask<String, Void , Void> {
         for (String p : params) {
             SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
             String query =  "SELECT * FROM "+DatabaseSMS.table_SendSMS
-                    + " WHERE "+DatabaseSMS.sendSMS_isSendToUser+ " = 'false' limit 3 ";
+                    + " WHERE "+DatabaseSMS.sendSMS_isSendToUser+ " = 'false' limit 10 ";
             Cursor getSendSMS = smsDatabase.rawQuery(query, null);
             Log.i(av.tag_SendSMS, "B 4- Get Table 'SendSMS' count: "+getSendSMS.getCount()
                     +" --> if (isSendToUser = false)"
