@@ -23,7 +23,7 @@ public class SendSMS_update {
                 "WHERE id = ' " + localID + " ' " +
                 "AND smsID = ' " + smsID + "' " +
                 "AND serverID = ' " + serverID + "' ";
-        Log.i(av.TagUpdateDatabase, "SendSMS_update (isSendToServer): "+query);
+        Log.i(av.tag_SendSMS, "11- SendSMS_update Send To Server OK \n Query: "+query);
 
         smsDatabase.execSQL(query);
         smsDatabase.close();

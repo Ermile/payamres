@@ -33,10 +33,10 @@ public class Async_sentsmssaved extends AsyncTask<item_sentsmssaved, Void , Void
             try {
                 SendSMS_update update = new SendSMS_update(context);
                 update.SendToServer(context, Localid, Smsid, Serverid,isSendToServer);
-                Log.d(av.TagAsync, "Async_SentSmsSaved (doInBackground): "+ Localid + " | " + Smsid+ " | " + Serverid );
+                Log.d(av.tag_SendSMS, "10- Async_SentSmsSaved : "+ Localid + " | " + Smsid+ " | " + Serverid );
 
             } catch (Exception error) {
-                Log.e(av.TagAsync, "Async_SentSmsSaved (doInBackground): " + error, null);
+                Log.e(av.tag_SendSMS, "10- Async_SentSmsSaved \n ERROR: " + error, null);
             }
 
         }
