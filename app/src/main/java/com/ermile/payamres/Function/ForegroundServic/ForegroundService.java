@@ -157,7 +157,7 @@ public class ForegroundService extends Service {
                         @Override
                         public void onResponse(String response) {
                             try {
-                                Log.d(av.jsonPost, "ForegroundService: "+response);
+                                Log.d(av.jsonPost, "ForegroundService: "+response.replace("\n-               ",""));
                                 JSONObject mainObject = new JSONObject(response);
                                 JSONObject result = mainObject.getJSONObject("result");
                                 JSONObject dashboard = result.getJSONObject("dashboard");
@@ -185,6 +185,7 @@ public class ForegroundService extends Service {
                                             ServerID = objectArray.getString("serverid");
 
                                             item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,ServerID);
+                                            Log.i(av.tag_GetSMS, "1- smsnewsaved : "+ localID+" | "+smsID+" | "+ServerID);
                                             new Async_smsnewsaved(context).execute(param_smsnewsaved);
                                         }
                                     }
@@ -249,7 +250,7 @@ public class ForegroundService extends Service {
                                             serverid = objectArray.getString("serverid") ;
                                             status_sent = objectArray.getString("status") ;
 
-                                            item_sentsmssaved param_SentSmsSaved = new item_sentsmssaved(smsid,localid,serverid,status_sent);
+                                            item_sentsmssaved param_SentSmsSaved = new item_sentsmssaved(smsid,localid,serverid,"true");
                                             new Async_sentsmssaved(context).execute(param_SentSmsSaved);
                                         }
                                     }

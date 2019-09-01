@@ -21,10 +21,10 @@ public class GetSMS_update {
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
         String query = "UPDATE "+ DatabaseSMS.table_GetSMS +
-                " SET isSendToServer = 'true' , serverID = ' " + serverID + " ' " +
-                "WHERE id = ' " + localID + " ' " +
-                "AND smsID = ' " + smsID + "' ";
-        Log.i(av.TagUpdateDatabase, "GetSMS_update serverID: "+query);
+                " SET isSendToServer = 'true' , serverID = '" + serverID + "'" +
+                " WHERE id = '" + localID + "'" +
+                " AND smsID = '" + smsID + "'";
+        Log.i(av.tag_GetSMS, "GetSMS_update serverID: "+query);
 
         smsDatabase.execSQL(query);
         smsDatabase.close();

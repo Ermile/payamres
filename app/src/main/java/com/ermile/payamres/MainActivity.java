@@ -290,17 +290,28 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                SaveUser_editor.putBoolean("has_number",true);
-                SaveUser_editor.putString("number_phone",edt_number.getText().toString());
-                Log.i(TAG,""+edt_number.getText().toString());
-                SaveUser_editor.apply();
-                finish();
-                startActivity(getIntent());
+                if (number_OK(edt_number)){
+                    SaveUser_editor.putBoolean("has_number",true);
+                    SaveUser_editor.putString("number_phone",edt_number.getText().toString());
+                    Log.i(TAG,""+edt_number.getText().toString());
+                    SaveUser_editor.apply();
+                    finish();
+                    startActivity(getIntent());
+                }
             }
         });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private Boolean number_OK(EditText editText){
+        String number = editText.getText().toString();
+        if (number.length() < 11
+                || !number.startsWith("09")){
+            return false;
+        }
+        return true;
     }
 
     /*Set title*/

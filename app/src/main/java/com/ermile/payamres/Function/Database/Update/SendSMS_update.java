@@ -19,10 +19,10 @@ public class SendSMS_update {
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
         String query = "UPDATE "+ DatabaseSMS.table_SendSMS +
-                " SET isSendToServer = " + " ' " + isSendToServer +" ' "+
-                "WHERE id = ' " + localID + " ' " +
-                "AND smsID = ' " + smsID + "' " +
-                "AND serverID = ' " + serverID + "' ";
+                " SET isSendToServer = '" + isSendToServer +"'"+
+                "WHERE id = '" + localID + "'" +
+                "AND smsID = '" + smsID + "'" +
+                "AND serverID = '" + serverID + "'";
         Log.i(av.tag_SendSMS, "11- SendSMS_update Send To Server OK \n Query: "+query);
 
         smsDatabase.execSQL(query);

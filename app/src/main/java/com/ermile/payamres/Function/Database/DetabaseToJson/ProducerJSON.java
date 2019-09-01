@@ -57,23 +57,28 @@ public class ProducerJSON {
 
             SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
             Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_GetSMS + " WHERE "+DatabaseSMS.getSMS_isSendToServer+ " = 'false' ", null);
-            while (infoDatabaseSMS.moveToNext()) {
-                String id,number,text,date,smsID,userData,isSendToServer,serverID = null;
-                id = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_localID)) ;
-                number = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_number)) ;
-                text = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_text)) ;
-                date = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_date)) ;
-                smsID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_smsID)) ;
-                userData = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_userData)) ;
-                isSendToServer = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_isSendToServer)) ;
-                serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_serverID)) ;
 
-                smsNew.add(new smsnew_jsonArray(id,number,text,date,smsID,userData,brand,model,SimSerialNumber));
+            if (infoDatabaseSMS.getCount() == 0){
                 mainJsonObject.setSmsnew(smsNew);
+            }else {
+                while (infoDatabaseSMS.moveToNext()) {
+                    String id,number,text,date,smsID,userData,isSendToServer,serverID = null;
+                    id = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_localID)) ;
+                    number = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_number)) ;
+                    text = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_text)) ;
+                    date = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_date)) ;
+                    smsID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_smsID)) ;
+                    userData = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_userData)) ;
+                    isSendToServer = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_isSendToServer)) ;
+                    serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_serverID)) ;
+
+                    smsNew.add(new smsnew_jsonArray(id,number,text,date,smsID,userData,brand,model,SimSerialNumber));
+                    mainJsonObject.setSmsnew(smsNew);
 
 //            Log.d(save_user.pTag, "json crated > smsNew[] "+ id +" | "+ number +" | "+ text +" | "+ date +" | "+ smsID +" | "+ userData +" | "+ brand +" | "+ model +" | "+ SimSerialNumber );
+                }
+                smsDatabase.close();
             }
-            smsDatabase.close();
             GetSMS_Sent(context,mainJsonObject);
         }catch (Exception error){
             Log.e(av.pTag, "Get SMS Send from database: "+error,null);
@@ -91,18 +96,22 @@ public class ProducerJSON {
                     +DatabaseSMS.sendSMS_isSendToUser +" = 'true' "
                     + "AND "+DatabaseSMS.sendSMS_isSendToServer +" = 'false'", null);
 
-            while (infoDatabaseSMS.moveToNext()) {
-                String id,smsID,serverID = null;
-                id = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
-                smsID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_smsID)) ;
-                serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
-
-                smsSent.add(new sentsms_jsonArray(id,smsID,serverID));
+            if (infoDatabaseSMS.getCount() == 0){
                 mainJsonObject.setSentsms(smsSent);
+            }else {
+                while (infoDatabaseSMS.moveToNext()) {
+                    String id,smsID,serverID = null;
+                    id = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
+                    smsID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_smsID)) ;
+                    serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.sendSMS_serverID)) ;
 
-                Log.d(av.pTag, "json crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
+                    smsSent.add(new sentsms_jsonArray(id,smsID,serverID));
+                    mainJsonObject.setSentsms(smsSent);
+
+                    Log.d(av.pTag, "json crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
+                }
+                smsDatabase.close();
             }
-            smsDatabase.close();
         }catch (Exception error){
             Log.e(av.pTag, "GetSMS_Sent from database : "+error,null );
         }

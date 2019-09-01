@@ -32,10 +32,10 @@ public class Async_smsnewsaved extends AsyncTask<item_smsnewsaved, Void , Void> 
 
                 GetSMS_update update = new GetSMS_update(context);
                 update.serverID(context, Localid, Smsid, Serverid);
-                Log.d(av.TagAsync, "Async_smsnewsaved (doInBackground): "+ Localid + " | " + Smsid+ " | " + Serverid );
+                Log.d(av.tag_GetSMS, "Async_smsnewsaved (doInBackground): "+ Localid + " | " + Smsid+ " | " + Serverid );
 
             } catch (Exception error) {
-                Log.e(av.TagAsync, "Async_smsnewsaved (doInBackground): " + error, null);
+                Log.e(av.tag_GetSMS, "Async_smsnewsaved (doInBackground): " + error, null);
             }
 
         }
