@@ -33,6 +33,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.ermile.payamres.Function.Database.Delete.GetSMS_delete;
+import com.ermile.payamres.Function.Database.Delete.SendSMS_delete;
 import com.ermile.payamres.Function.ForegroundServic.ForegroundService;
 import com.ermile.payamres.Function.SaveDataUser.SaveManager;
 import com.ermile.payamres.Static.Network.AppContoroler;
@@ -43,6 +45,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,10 +109,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-
-
         /*Get save_user*/
         final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
         final SharedPreferences.Editor SaveUser_editor = save_user.edit();
@@ -191,7 +196,9 @@ public class MainActivity extends AppCompatActivity {
 
         Set_Title();
 
-
+        new SendSMS_delete().delete30DayAgo(getApplicationContext());
+        new GetSMS_delete().delete30DayAgo(getApplicationContext());
+        Log.d(TAG, "Delete 30 Day Ago ");
 
 
     }

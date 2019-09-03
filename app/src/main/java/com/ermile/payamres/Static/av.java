@@ -1,5 +1,8 @@
 package com.ermile.payamres.Static;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class av {
     public static String pTag = "AllLogForPayamresApp";
     public static String iTag = "ImportantLogForPayamresApp";
@@ -21,5 +24,7 @@ public class av {
 
     public static int min_SendSMS = 1000;
     public static int max_SendSMS = 5000;
+
+
 
 }

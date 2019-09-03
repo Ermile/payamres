@@ -13,6 +13,7 @@ import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Static.av;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class IncomingSms extends BroadcastReceiver {
@@ -36,7 +37,9 @@ public class IncomingSms extends BroadcastReceiver {
 
                         numberSMS = msgs[i].getOriginatingAddress();
                         textSMS = msgs[i].getMessageBody();
-                        timeSMS = DateFormat.getDateTimeInstance().format(new Date());
+
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                        timeSMS = simpleDateFormat.format(new Date());
                         idSMS = msgs[i]+"";
                         userDataSMS = msgs[i].getUserData()+"";
 
