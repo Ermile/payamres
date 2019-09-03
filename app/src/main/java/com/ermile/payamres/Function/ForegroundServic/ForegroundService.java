@@ -28,6 +28,7 @@ import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_queue;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_sentsmssaved;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_smsnewsaved;
 import com.ermile.payamres.Function.SaveDataUser.SaveManager;
+import com.ermile.payamres.Function.syncSMS;
 import com.ermile.payamres.Static.prival;
 import com.ermile.payamres.Function.SendSMSToUser;
 import com.ermile.payamres.MainActivity;
@@ -50,9 +51,6 @@ import java.util.Map;
 public class ForegroundService extends Service {
     /*Static Value*/
     private static String TAG = "ForegroundService";
-    String link_newSMS = "https://khadije.com/api/v6/smsapp/queue";
-    String link_smsIsSent = "https://khadije.com/api/v6/smsapp/sent";
-    String id_smsForSend = null;
 
     /*Value Static Notify*/
     String payamres_string = " پیامرس ";
@@ -78,20 +76,12 @@ public class ForegroundService extends Service {
             Log.d(TAG, "run LastSMSSending ,"+" power Service is : "+powerServic);
             if (powerServic){
                 /*Run Send SMS*/
-                SyncSmsToServer(getApplicationContext());
+                new syncSMS().SyncSmsToServer(getApplicationContext());
                 handler.postDelayed(runnable, 60000);
             }
         }
     };
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        day_send = save_user.getString("save_Ds", "");
-        day_receive = save_user.getString("save_Dr", "");
-        day_date = save_user.getString("save_date", "");
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -149,202 +139,13 @@ public class ForegroundService extends Service {
     }
 
 
-    private void SyncSmsToServer(final Context context){
-        final String textJsonDatabaseSMS = new ProducerJSON(context).Producer(context);
-        /*Get Number Phone */
-        final String number_phone = SaveManager.get(context).get_Number().get(SaveManager.numberPhone);
-        if (number_phone != null){
-            StringRequest post_NewSMSSending = new StringRequest(Request.Method.POST, av.url_Sync,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                Log.d(av.jsonPost, "ForegroundService: "+response.replace("\n-               ",""));
-                                JSONObject mainObject = new JSONObject(response);
-                                JSONObject result = mainObject.getJSONObject("result");
-                                if (!result.isNull("status")){
-                                    Boolean status = result.getBoolean("status");
-                                    if (status){
-
-                                    }else {
-
-                                    }
-                                }
-
-                                JSONObject dashboard = result.getJSONObject("dashboard");
-                                /*Set for Nofit Forgrund*/
-                                if (!dashboard.isNull("day")){
-                                    JSONObject day = dashboard.getJSONObject("day");
-                                    String sendTody = day.getString("send");
-                                    String receiveTody = day.getString("receive");
-                                    SaveManager.get(context).save_Day(receiveTody,sendTody);
-                                    /*Set ForgroundServic*/
-                                    String dateTody = day.getString("date");
-                                    updateNotifForground(dateTody,sendTody,receiveTody);
-                                }
-
-                                if (!dashboard.isNull("week")){
-                                    JSONObject week = dashboard.getJSONObject("week");
-                                    String week_send = week.getString("send");
-                                    String week_receive = week.getString("receive");
-                                    SaveManager.get(context).save_week(week_receive,week_send);
-                                }
-
-                                if (!dashboard.isNull("month")){
-                                    JSONObject month = dashboard.getJSONObject("month");
-                                    String month_send = month.getString("send");
-                                    String month_receive = month.getString("receive");
-                                    SaveManager.get(context).save_month(month_receive,month_send);
-                                }
-
-
-                                if (!dashboard.isNull("total")){
-                                    JSONObject total = dashboard.getJSONObject("total");
-                                    String all_send = total.getString("send");
-                                    String all_receive = total.getString("receive");
-                                    SaveManager.get(context).save_all(all_receive,all_send);
-                                }
 
 
 
 
 
 
-                                /* Update GetSMS */
-                                if(!result.isNull("smsnewsaved")){
-                                    JSONArray smsNewSaved = result.getJSONArray("smsnewsaved");
-                                    for (int i = 0; i < smsNewSaved.length(); i++) {
-                                        String localID,smsID,ServerID = null;
-                                        JSONObject objectArray =  smsNewSaved.getJSONObject(i);
-                                        if (!objectArray.isNull("localid") ||
-                                                !objectArray.isNull("smsid")||
-                                                !objectArray.isNull("serverid"))
-                                        {
-                                            localID = objectArray.getString("localid");
-                                            smsID = objectArray.getString("smsid");
-                                            ServerID = objectArray.getString("serverid");
-
-                                            item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,ServerID);
-                                            Log.i(av.tag_GetSMS, "1- smsnewsaved : "+ localID+" | "+smsID+" | "+ServerID);
-                                            new Async_smsnewsaved(context).execute(param_smsnewsaved);
-                                        }
-                                    }
-                                }
-
-                                /* New SMS */
-                                if (!result.isNull("queue")){
-                                    JSONArray queue = result.getJSONArray("queue");
-                                    for (int i = 0; i < queue.length(); i++) {
-                                        String toNumber,text,ServerID = null;
-                                        JSONObject objectArray =  queue.getJSONObject(i);
-
-                                        if (!objectArray.isNull("togateway") ||
-                                                !objectArray.isNull("answertext")||
-                                                !objectArray.isNull("id"))
-                                        {
-                                            toNumber = objectArray.getString("togateway") ;
-                                            text = objectArray.getString("answertext");
-                                            ServerID = objectArray.getString("id");
-                                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                                            String date = simpleDateFormat.format(new Date());
-                                            item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","",date,"","","","","","","","","");
-                                            Log.i(av.tag_SendSMS, "A 1- (queue) Start Async Save SmsNew To 'Table SendSMS' > "+i+" \n "
-                                                    +"ServerID: "+ServerID+" toNumber: "+toNumber+" Massage: "+text.replace("\n"," ")+" | date: "+date);
-                                            new Async_queue(context).execute(param_itemQueu);
-
-                                        }
-                                    }
-                                }else if (!result.isNull("notsent")){
-                                    JSONArray queue = result.getJSONArray("notsent");
-                                    for (int i = 0; i < queue.length(); i++) {
-                                        String toNumber,text,ServerID = null;
-                                        JSONObject objectArray =  queue.getJSONObject(i);
-
-                                        if (!objectArray.isNull("togateway") ||
-                                                !objectArray.isNull("answertext")||
-                                                !objectArray.isNull("id"))
-                                        {
-                                            toNumber = objectArray.getString("togateway") ;
-                                            text = objectArray.getString("answertext");
-                                            ServerID = objectArray.getString("id");
-                                            item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
-                                            Log.i(av.tag_SendSMS, "A 1- (noSent) Start Async Save SmsNew To 'Table SendSMS' > "+i+" \n "
-                                                    +"ServerID: "+ServerID+" toNumber: "+toNumber+" Massage: "+text.replace("\n"," "));
-                                            new Async_queue(context).execute(param_itemQueu);
-                                        }
-                                    }
-                                }
-
-                                /* Update SendSMS */
-                                if (!result.isNull("sentsmssaved")){
-                                    JSONArray sentSmsSaved = result.getJSONArray("sentsmssaved");
-                                    for (int i = 0; i < sentSmsSaved.length(); i++) {
-                                        String smsid,localid,serverid,status_sent;
-                                        JSONObject objectArray =  sentSmsSaved.getJSONObject(i);
-
-                                        if (!objectArray.isNull("smsid") ||
-                                                !objectArray.isNull("localid") ||
-                                                !objectArray.isNull("serverid") ||
-                                                !objectArray.isNull("status"))
-                                        {
-                                            smsid = objectArray.getString("smsid");
-                                            localid = objectArray.getString("localid") ;
-                                            serverid = objectArray.getString("serverid") ;
-                                            status_sent = objectArray.getString("status") ;
-
-                                            item_sentsmssaved param_SentSmsSaved = new item_sentsmssaved(smsid,localid,serverid,"true");
-                                            new Async_sentsmssaved(context).execute(param_SentSmsSaved);
-                                        }
-                                    }
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG , "new sms > error");
-                }
-            }) {
-
-                @Override
-                public Map<String, String> getHeaders() {
-                    HashMap<String, String> header = new HashMap<>();
-                    header.put("smsappkey", prival.keyapp);
-                    header.put("gateway", number_phone);
-                    Log.d(TAG , "Send Header");
-                    return header;
-                }
-
-                @Override
-                public byte[] getBody() throws AuthFailureError {
-                    byte[] body = new byte[0];
-                    try {
-                        body = textJsonDatabaseSMS.getBytes("UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        Log.e(av.iTag, "Unable to gets bytes from JSON", e.fillInStackTrace());
-                    }
-                    return body;
-                }
-
-                @Override
-                public String getBodyContentType() {
-                    Log.d(av.iTag, "getBodyContentType: "+ textJsonDatabaseSMS);
-                    return "application/json";
-                }
-            };
-            AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
-        }
-
-        new SendSMSToUser(context).execute("1");
-    }
-
-
-
-
-
-    private void updateNotifForground(String dayDesc,String SendSMS, String ReceiveSMS){
+    public void updateNotifForground(String dayDesc,String SendSMS, String ReceiveSMS){
         /*Update Notify Text*/
         builder .setContentTitle(dayDesc)
                 .setContentText(payamres_string + SendSMS+ " ارسال "+" - " + ReceiveSMS + " دریافت " )

@@ -33,10 +33,9 @@ public class ProducerJSON {
 
     public String Producer(Context context){
         try {
-            SharedPreferences save_user = context.getSharedPreferences("save_user", MODE_PRIVATE);
             /* Get Number & Status */
             final String number_phone = SaveManager.get(context).get_Number().get(SaveManager.numberPhone);
-            boolean statusServer = save_user.getBoolean("status",true);
+            boolean statusServer = SaveManager.get(context).get_Status().get(SaveManager.status_server);
             detail_jsonObject detail_Json = new detail_jsonObject(number_phone);
             main_jsonObject mJson = new main_jsonObject(statusServer,detail_Json);
             GetSMS_Send(context,mJson);

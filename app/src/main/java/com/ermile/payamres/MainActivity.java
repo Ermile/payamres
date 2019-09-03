@@ -2,6 +2,7 @@ package com.ermile.payamres;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
@@ -37,6 +40,8 @@ import com.ermile.payamres.Function.Database.Delete.GetSMS_delete;
 import com.ermile.payamres.Function.Database.Delete.SendSMS_delete;
 import com.ermile.payamres.Function.ForegroundServic.ForegroundService;
 import com.ermile.payamres.Function.SaveDataUser.SaveManager;
+import com.ermile.payamres.Function.Status;
+import com.ermile.payamres.Function.syncSMS;
 import com.ermile.payamres.Static.Network.AppContoroler;
 import com.ermile.payamres.Static.av;
 import com.ermile.payamres.Static.prival;
@@ -76,71 +81,10 @@ public class MainActivity extends AppCompatActivity {
     GifImageView GIFs;
     SwipeRefreshLayout Refresh_json;
 
-    String noNull = null;
-    String day_send ,day_receive ,week_send , week_receive ,month_send , month_receive ,total_send ,total_receive;
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        /*Set Version number*/
-        try {
-            PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
-            versionAPP = pInfo.versionName;
-            final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-            day_send = save_user.getString("save_Ds", "");
-            day_receive = save_user.getString("save_Dr", "");
-
-            week_send = save_user.getString("save_Ws", "");
-            week_receive = save_user.getString("save_Wr", "");
-
-            month_send = save_user.getString("save_Ms", "");
-            month_receive = save_user.getString("save_Mr", "");
-
-            total_send = save_user.getString("save_As", "");
-            total_receive = save_user.getString("save_Ar", "");
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            versionAPP = "last version";
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        /*Get save_user*/
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final boolean first_open = save_user.getBoolean("first_open", true);
-        final boolean has_number = save_user.getBoolean("has_number", false);
-        /*Get Number Phone */
-        final String number_phone = save_user.getString("number_phone", null);
-
-        /*First Open app*/
-        if (first_open && has_number){
-            SaveUser_editor.putBoolean("first_open",false);
-            SaveUser_editor.apply();
-            SendSMS_Tester();
-        }
-        if (!has_number || number_phone == null){
-            SAVE_NUMBER();
-        }
-        if (has_number){
-            /*Start Services*/
-            startService();
-        }
-
-
-
-        /*Get Permission for SMS and ID Simcart*/
-        smsPermission_isOK();
-
-        /*My Value*/
-        Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);
-        status_CheckBox = findViewById(R.id.status_CheckBox);
+    private void setText(){
+        new syncSMS().SyncSmsToServer(getApplicationContext());
         txv_versionNumber = findViewById(R.id.txv_versionNumber);
-        txv_versionNumber.setText(versionAPP);
         tv_numberphone = findViewById(R.id.tv_numberphone);
         tv_todayR = findViewById(R.id.tv_todayR);
         tv_todayS = findViewById(R.id.tv_todayS);
@@ -150,51 +94,133 @@ public class MainActivity extends AppCompatActivity {
         tv_monthS = findViewById(R.id.tv_monthS);
         tv_allR = findViewById(R.id.tv_allR);
         tv_allS = findViewById(R.id.tv_allS);
+
+        status_CheckBox = findViewById(R.id.status_CheckBox);
         GIFs = findViewById(R.id.GIFs);
-        Refresh_json = findViewById(R.id.Refresh_json);
+
         /*Set Version number*/
         try {
-            PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
-            txv_versionNumber.setText(pInfo.versionName);
-            versionAPP = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        /*Set Direction RTL*/
-        ((GifDrawable)GIFs.getDrawable()).stop();
-        ViewCompat.setLayoutDirection(Layout_ActivityMain,ViewCompat.LAYOUT_DIRECTION_RTL);
+            tv_numberphone.setText(SaveManager.get(getApplicationContext()).get_Number().get(SaveManager.numberPhone));
+            tv_todayR.setText(SaveManager.get(getApplicationContext()).get_Day().get(SaveManager.day_Receive));
+            tv_todayS.setText(SaveManager.get(getApplicationContext()).get_Day().get(SaveManager.day_Send));
 
+            tv_weekR.setText(SaveManager.get(getApplicationContext()).get_week().get(SaveManager.week_Receive));
+            tv_weekS.setText(SaveManager.get(getApplicationContext()).get_week().get(SaveManager.week_Send));
 
-        Refresh_json.setRefreshing(true);
-        Refresh_json.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                Set_Title();
+            tv_monthR.setText(SaveManager.get(getApplicationContext()).get_month().get(SaveManager.month_Receive));
+            tv_monthS.setText(SaveManager.get(getApplicationContext()).get_month().get(SaveManager.month_Send));
+
+            tv_allR.setText(SaveManager.get(getApplicationContext()).get_all().get(SaveManager.all_Receive));
+            tv_allS.setText(SaveManager.get(getApplicationContext()).get_all().get(SaveManager.all_Send));
+
+            boolean STATUS_SAVED = SaveManager.get(getApplicationContext()).get_Status().get(SaveManager.status_server);
+            if (STATUS_SAVED){
+                status_CheckBox.setChecked(true);
+                servic_smsAI =true;
+                ((GifDrawable)GIFs.getDrawable()).start();
+            }else {
+                status_CheckBox.setChecked(false);
+                servic_smsAI = false;
+                ((GifDrawable)GIFs.getDrawable()).stop();
             }
-        });
 
+            try {
+                PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
+                versionAPP = pInfo.versionName;
+                txv_versionNumber.setText(pInfo.versionName);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+                Log.e(TAG, "setText: ",e );
+            }
+        }catch (Exception error){
+            Log.e(TAG, "setText: ", error);
+        }
+
+
+    }
+
+    public void CheckBox(){
+        status_CheckBox = findViewById(R.id.status_CheckBox);
+        GIFs = findViewById(R.id.GIFs);
         status_CheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 if (servic_smsAI){
                     servic_smsAI = false;
                     status_CheckBox.setChecked(false);
                     ((GifDrawable)GIFs.getDrawable()).stop();
-                    SaveUser_editor.putBoolean("status",servic_smsAI);
-                    SaveUser_editor.apply();
-                    SET_STATUS();
+                    new Status().sendToServer(getApplicationContext(),servic_smsAI);
+                    setText();
                 }else {
                     servic_smsAI = true;
                     ((GifDrawable)GIFs.getDrawable()).start();
                     status_CheckBox.setChecked(true);
-                    SaveUser_editor.putBoolean("status",servic_smsAI);
-                    SaveUser_editor.apply();
-                    SET_STATUS();
+                    new Status().sendToServer(getApplicationContext(),servic_smsAI);
+                    setText();
                 }
             }
         });
 
-        Set_Title();
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setText();
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setText();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        setText();
+        CheckBox();
+
+        smsPermission_isOK();
+        /*First Open app*/
+        String number = SaveManager.get(getApplicationContext()).get_Number().get(SaveManager.numberPhone);
+        boolean firstOpen = SaveManager.get(getApplicationContext()).get_Info().get(SaveManager.firstOpen);
+        if (number == null && !firstOpen){
+            SendSMS_Tester();
+            SAVE_NUMBER();
+        }else {
+            if (hasInternetConnection()){
+                setText();
+                startService();
+            }
+        }
+
+
+
+
+        /*Set Direction RTL*/
+
+        Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);
+        ViewCompat.setLayoutDirection(Layout_ActivityMain,ViewCompat.LAYOUT_DIRECTION_RTL);
+
+        Refresh_json = findViewById(R.id.Refresh_json);
+        Refresh_json.setRefreshing(false);
+        Refresh_json.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                try {
+                    setText();
+                    Refresh_json.setRefreshing(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         new SendSMS_delete().delete30DayAgo(getApplicationContext());
         new GetSMS_delete().delete30DayAgo(getApplicationContext());
@@ -205,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*check Permission for SMS*/
-    public void smsPermission_isOK(){
+    public Boolean smsPermission_isOK(){
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED ||ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED )
         {
             ActivityCompat.requestPermissions(this,new String[]
@@ -216,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
                             Manifest.permission.READ_PHONE_STATE
                     }, 1);
             Log.i(TAG,"request-user: permission SMS ");
+            return false;
 
         }
         else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED )
@@ -225,72 +252,17 @@ public class MainActivity extends AppCompatActivity {
                             Manifest.permission.READ_PHONE_STATE
                     }, 1);
             Log.i(TAG,"request-user: permission SMS ");
+            return false;
 
         }
         else{
             Log.i(TAG,"permission SMS is true!");
-        }
-    }
-
-    /*Off and On system*/
-    public void SET_STATUS(){
-        /*Get Number Phone */
-        final SharedPreferences save_userSHP = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_userSHP.getBoolean("has_number", false);
-        final String number_phone = save_userSHP.getString("number_phone", null);
-        if (has_number && number_phone != null){
-            StringRequest post_user_add = new StringRequest(Request.Method.POST, av.link_status,
-                    new Response.Listener<String>(){
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject mainObject = new JSONObject(response);
-                                /*if sending from database is ok > Delete data from database*/
-                                Boolean ok_status = mainObject.getBoolean("ok");
-                                if (ok_status){
-                                    JSONArray msg = mainObject.getJSONArray("msg");
-                                    for (int i = 0 ; i <=  msg.length() ; i++){
-                                        JSONObject get_msg = msg.getJSONObject(i);
-                                        String type = get_msg.getString("type");
-                                        String text = get_msg.getString("text");
-                                    }
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                }
-            })
-            {
-                @Override
-                public Map<String, String> getHeaders()  {
-                    HashMap<String, String> headers = new HashMap<>();
-                    headers.put("smsappkey", smsappkey );
-                    headers.put("gateway", number_phone );
-                    return headers;
-                }
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> posting = new HashMap<>();
-                    posting.put("status", Boolean.toString(servic_smsAI));
-                    return posting;
-                }
-            };AppContoroler.getInstance().addToRequestQueue(post_user_add);
+            return true;
         }
     }
 
     /*Set Number*/
     public void SAVE_NUMBER() {
-        /*Get and Save Number*/
-        final SharedPreferences save_user = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final SharedPreferences.Editor SaveUser_editor = save_user.edit();
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_savenumber, null);
         final EditText edt_number = view.findViewById(R.id.edt_number);
@@ -301,15 +273,10 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (number_OK(edt_number)){
-                    SaveUser_editor.putBoolean("has_number",true);
-                    SaveUser_editor.putString("number_phone",edt_number.getText().toString());
-                    SaveManager.get(getApplicationContext()).save_Number(edt_number.getText().toString());
-                    Log.i(TAG,""+edt_number.getText().toString());
-                    SaveUser_editor.apply();
-                    finish();
-                    startActivity(getIntent());
-                }
+                SaveManager.get(getApplicationContext()).save_Number(edt_number.getText().toString());
+                Log.i(TAG,""+edt_number.getText().toString());
+                finish();
+                startActivity(getIntent());
             }
         });
 
@@ -317,175 +284,13 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private Boolean number_OK(EditText editText){
-        String number = editText.getText().toString();
-        if (number.length() < 11
-                || !number.startsWith("09")){
-            return false;
-        }
-        return true;
-    }
-
-    /*Set title*/
-    public void Set_Title(){
-        status_CheckBox = findViewById(R.id.status_CheckBox);
-        tv_numberphone = findViewById(R.id.tv_numberphone);
-        tv_todayR = findViewById(R.id.tv_todayR);
-        tv_todayS = findViewById(R.id.tv_todayS);
-        tv_weekR = findViewById(R.id.tv_weekR);
-        tv_weekS = findViewById(R.id.tv_weekS);
-        tv_monthR = findViewById(R.id.tv_monthR);
-        tv_monthS = findViewById(R.id.tv_monthS);
-        tv_allR = findViewById(R.id.tv_allR);
-        tv_allS = findViewById(R.id.tv_allS);
-        GIFs = findViewById(R.id.GIFs);
-        Refresh_json = findViewById(R.id.Refresh_json);
-        /*Get Number Phone */
-        final SharedPreferences save_userSHP = getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final SharedPreferences.Editor SaveUser_editor = save_userSHP.edit();
-        final Boolean has_number = save_userSHP.getBoolean("has_number", false);
-        final String number_phone = save_userSHP.getString("number_phone", null);
-        /*Json*/
-        StringRequest post_user_add = new StringRequest(Request.Method.POST, av.link_dashboard,
-                new Response.Listener<String>(){
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject mainObject = new JSONObject(response);
-                            /*if sending from database is ok > Delete data from database*/
-                            Boolean ok_dashboard = mainObject.getBoolean("ok");
-                            if (ok_dashboard){
-                                JSONObject result = mainObject.getJSONObject("result");
-                                final Boolean status = result.getBoolean("status");
-
-                                if (status){
-                                    ((GifDrawable)GIFs.getDrawable()).start();
-                                    status_CheckBox.setChecked(true);
-                                    servic_smsAI = status;
-
-                                    SaveUser_editor.putBoolean("status",servic_smsAI);
-                                    SaveUser_editor.apply();
-
-                                }else {
-                                    ((GifDrawable)GIFs.getDrawable()).stop();
-                                    status_CheckBox.setChecked(false);
-                                    servic_smsAI = status;
-
-                                    SaveUser_editor.putBoolean("status",servic_smsAI);
-                                    SaveUser_editor.apply();
-                                }
-
-                                JSONObject day = result.getJSONObject("day");
-                                day_send = day.getString("send");
-                                day_receive = day.getString("receive");
-
-                                JSONObject week = result.getJSONObject("week");
-                                week_send = week.getString("send");
-                                week_receive = week.getString("receive");
-
-                                JSONObject month = result.getJSONObject("month");
-                                month_send = month.getString("send");
-                                month_receive = month.getString("receive");
-
-                                JSONObject total = result.getJSONObject("total");
-                                total_send = total.getString("send");
-                                total_receive = total.getString("receive");
-
-                                /*Save Dashboard*/
-                                SaveUser_editor.putString("save_Ds",day_send);
-                                SaveUser_editor.putString("save_Dr",day_receive);
-                                /*Week*/
-                                SaveUser_editor.putString("save_Ws",week_send);
-                                SaveUser_editor.putString("save_Wr",week_receive);
-                                /*Month*/
-                                SaveUser_editor.putString("save_Ms",month_send);
-                                SaveUser_editor.putString("save_Mr",month_receive);
-                                /*All*/
-                                SaveUser_editor.putString("save_As",total_send);
-                                SaveUser_editor.putString("save_Ar",total_receive);
-                                SaveUser_editor.apply();
-
-                                noNull = total_send+total_receive;
-                                if (noNull != null){
-                                    Refresh_json.setRefreshing(false);
-                                }
-
-                                tv_allS.setText(total_send);
-                                tv_allR.setText(total_receive);
-
-                                tv_todayR.setText(day_receive);
-                                tv_todayS.setText(day_send);
-
-                                tv_weekR.setText(week_receive);
-                                tv_weekS.setText(week_send);
-
-                                tv_monthR.setText(month_receive);
-                                tv_monthS.setText(month_send);
-
-                                if (has_number){
-                                    tv_numberphone.setText(number_phone);
-                                }else {
-                                    tv_numberphone.setText("No Number");
-                                }
-
-
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (has_number){
-                    tv_numberphone.setText(number_phone);
-                }else {
-                    tv_numberphone.setText("No Number");
-                }
-                tv_allS.setText(total_send);
-                tv_allR.setText(total_receive);
-
-                tv_todayR.setText(day_receive);
-                tv_todayS.setText(day_send);
-
-                tv_weekR.setText(week_receive);
-                tv_weekS.setText(week_send);
-
-                tv_monthR.setText(month_receive);
-                tv_monthS.setText(month_send);
-                ((GifDrawable)GIFs.getDrawable()).stop();
-                Snackbar snackbar = Snackbar.make(Layout_ActivityMain,"Error Connection!", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Refresh", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                finish();
-                                startActivity(getIntent());
-                            }
-                        });
-                snackbar.setActionTextColor(Color.WHITE);
-                View sbView = snackbar.getView();
-                TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
-                textView.setTextColor(Color.YELLOW);
-                snackbar.setDuration(999999999);
-                snackbar.show();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders()  {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("smsappkey", smsappkey );
-                headers.put("gateway", number_phone );
-                return headers;
-            }
-        };AppContoroler.getInstance().addToRequestQueue(post_user_add);
-    }
 
     private void SendSMS_Tester(){
         try {
             PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(av.phone_evazzadeh, null, "Payamres "+pInfo.versionName+"\n"+model, null, null);
+            SaveManager.get(getApplicationContext()).save_Info(true);
             Log.i(TAG , "SendSMS_Tester for phone_evazzadeh");
         } catch (Exception e) {
             Log.i(TAG, "No Send");
@@ -505,6 +310,40 @@ public class MainActivity extends AppCompatActivity {
         stopService(serviceIntent);
     }
 
+
+    /*Check Internet Connection*/
+    private boolean hasInternetConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiNetwork != null && wifiNetwork.isConnected())
+        {
+            return true;
+        }
+        NetworkInfo mobileNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if (mobileNetwork != null && mobileNetwork.isConnected())
+        {
+            return true;
+        }
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnected())
+        {
+            return true;
+        }
+        Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);
+//        txt_load.setText(title_snackbar);
+        Snackbar snackbar = Snackbar.make(Layout_ActivityMain, "Check Network", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Refresh", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                        startActivity(getIntent());
+                    }
+                });
+        snackbar.setActionTextColor(Color.WHITE);
+        snackbar.setDuration(999999999);
+        snackbar.show();
+        return false;
+    }
 
     /** Oder Method (No Used)*/
     private void alertDialog(String title, final String desc, String btnTitle, boolean Cancelable){

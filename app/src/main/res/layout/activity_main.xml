@@ -51,6 +51,7 @@
                             android:id="@+id/status_CheckBox"
                             android:layout_marginRight="10dp"
                             android:checked="false"
+                            android:tag="CheckBox"
                             android:buttonTint="#fff"
                             android:layout_width="match_parent"
                             android:layout_height="30dp" />

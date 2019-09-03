@@ -21,36 +21,7 @@ import java.util.Map;
 
 public class Status {
 
-    Context context;
-
-    public Status(Context context) {
-        this.context = context;
-    }
-
-    public Boolean infoStatus(Context context){
-        String status = SaveManager.get(context).get_Status().get(SaveManager.status_server);
-        if (status == "true"){
-            return true;
-
-        }else if (status == "false"){
-            return false;
-        }else {
-            return false;
-        }
-    }
-
-    public void Set_Status(Context context,String status){
-        if (status == "true"){
-            SaveManager.get(context).save_Status(status);
-
-        }else if (status == "false"){
-            SaveManager.get(context).save_Status(status);
-        }else {
-
-        }
-    }
-
-    public void sendToServer(Context context, final Boolean status){
+    public void sendToServer(final Context context, final Boolean status){
         final String number = SaveManager.get(context).get_Number().get(SaveManager.numberPhone);
         if (number != null){
             StringRequest post_user_add = new StringRequest(Request.Method.POST, av.link_status,

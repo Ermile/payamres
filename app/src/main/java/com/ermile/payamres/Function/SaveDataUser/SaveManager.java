@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
+
+import com.ermile.payamres.Static.av;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +15,7 @@ public class SaveManager extends ContextWrapper {
     SharedPreferences.Editor editor;
     SharedPreferences sharedPreferences;
     public static final String SH_PREF_NAME = "ShPerfManager_Payamres";
+    String lod = av.loading;
 
 
     @SuppressLint("CommitPrefEdits")
@@ -39,13 +43,25 @@ public class SaveManager extends ContextWrapper {
 
     /** Save Status*/
     public static final String status_server = "status_server";
-    public void save_Status(String statusServic) {
-        editor.putString(status_server, statusServic);
+    public void save_Status(Boolean statusServic) {
+        editor.putBoolean(status_server, statusServic);
         editor.apply();
     }
-    public Map<String, String> get_Status() {
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(status_server, String.valueOf(sharedPreferences.getBoolean(status_server, false )));
+    public Map<String, Boolean> get_Status() {
+        HashMap<String, Boolean> hashMap = new HashMap<>();
+        hashMap.put(status_server, sharedPreferences.getBoolean(status_server, false ));
+        return hashMap;
+    }
+
+    /** Save Info*/
+    public static final String firstOpen = "firstOpen";
+    public void save_Info(Boolean firstOpens) {
+        editor.putBoolean(firstOpen, firstOpens);
+        editor.apply();
+    }
+    public Map<String, Boolean> get_Info() {
+        HashMap<String, Boolean> hashMap = new HashMap<>();
+        hashMap.put(firstOpen, sharedPreferences.getBoolean(firstOpen, false ));
         return hashMap;
     }
 
@@ -59,8 +75,8 @@ public class SaveManager extends ContextWrapper {
     }
     public Map<String, String> get_Day() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(day_Receive, sharedPreferences.getString(day_Receive, null ));
-        hashMap.put(day_Send, sharedPreferences.getString(day_Send, null ));
+        hashMap.put(day_Receive, sharedPreferences.getString(day_Receive, lod ));
+        hashMap.put(day_Send, sharedPreferences.getString(day_Send, lod ));
         return hashMap;
     }
 
@@ -74,8 +90,8 @@ public class SaveManager extends ContextWrapper {
     }
     public Map<String, String> get_week() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(week_Receive, sharedPreferences.getString(week_Receive, null ));
-        hashMap.put(week_Send, sharedPreferences.getString(week_Send, null ));
+        hashMap.put(week_Receive, sharedPreferences.getString(week_Receive, lod ));
+        hashMap.put(week_Send, sharedPreferences.getString(week_Send, lod ));
         return hashMap;
     }
 
@@ -89,8 +105,8 @@ public class SaveManager extends ContextWrapper {
     }
     public Map<String, String> get_month() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(month_Receive, sharedPreferences.getString(month_Receive, null ));
-        hashMap.put(month_Send, sharedPreferences.getString(month_Send, null ));
+        hashMap.put(month_Receive, sharedPreferences.getString(month_Receive, lod ));
+        hashMap.put(month_Send, sharedPreferences.getString(month_Send, lod ));
         return hashMap;
     }
 
@@ -104,8 +120,8 @@ public class SaveManager extends ContextWrapper {
     }
     public Map<String, String> get_all() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(all_Receive, sharedPreferences.getString(all_Receive, null ));
-        hashMap.put(all_Send, sharedPreferences.getString(all_Send, null ));
+        hashMap.put(all_Receive, sharedPreferences.getString(all_Receive, lod ));
+        hashMap.put(all_Send, sharedPreferences.getString(all_Send, lod ));
         return hashMap;
     }
 
