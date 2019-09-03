@@ -2,6 +2,7 @@ package com.ermile.payamres.Function.Database.DetabaseToJson;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,10 +16,13 @@ import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.main_jsonO
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.sentsms_jsonArray;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.smsnew_jsonArray;
 import com.ermile.payamres.Function.Database.DatabaseSMS;
+import com.ermile.payamres.Function.SaveDataUser.SaveManager;
 import com.ermile.payamres.Static.av;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ProducerJSON {
     Context context;
@@ -29,8 +33,12 @@ public class ProducerJSON {
 
     public String Producer(Context context){
         try {
-            detail_jsonObject detail_Json = new detail_jsonObject("09195191378");
-            main_jsonObject mJson = new main_jsonObject(false,detail_Json);
+            SharedPreferences save_user = context.getSharedPreferences("save_user", MODE_PRIVATE);
+            /* Get Number & Status */
+            final String number_phone = SaveManager.get(context).get_Number().get(SaveManager.numberPhone);
+            boolean statusServer = save_user.getBoolean("status",true);
+            detail_jsonObject detail_Json = new detail_jsonObject(number_phone);
+            main_jsonObject mJson = new main_jsonObject(statusServer,detail_Json);
             GetSMS_Send(context,mJson);
 
             Gson gson = new Gson();
@@ -75,7 +83,6 @@ public class ProducerJSON {
                     smsNew.add(new smsnew_jsonArray(id,number,text,date,smsID,userData,brand,model,SimSerialNumber));
                     mainJsonObject.setSmsnew(smsNew);
 
-//            Log.d(save_user.pTag, "json crated > smsNew[] "+ id +" | "+ number +" | "+ text +" | "+ date +" | "+ smsID +" | "+ userData +" | "+ brand +" | "+ model +" | "+ SimSerialNumber );
                 }
                 smsDatabase.close();
             }

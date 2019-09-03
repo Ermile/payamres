@@ -25,52 +25,27 @@ public class SaveManager extends ContextWrapper {
     }
 
 
-
-    /** FirstOpenApp */
-    public static final String firstOpen = "first";
-    public void save_FirstOpenApp(boolean FirstOpenApp) {
-        editor.putBoolean(firstOpen, FirstOpenApp);
-        editor.apply();
-    }
-    public Map<String, String> get_FirstOpenApp() {
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(firstOpen, String.valueOf(sharedPreferences.getBoolean(firstOpen, false )));
-        return hashMap;
-    }
-
-    /** save_Permission SMS*/
-    public static final String permissionSMS = "permissionSMS";
-    public void save_PermissionSMS(boolean SmsPermission) {
-        editor.putBoolean(permissionSMS, SmsPermission);
-        editor.apply();
-    }
-    public Map<String, String> get_PermissionSMS() {
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(permissionSMS, String.valueOf(sharedPreferences.getBoolean(permissionSMS, false )));
-        return hashMap;
-    }
-
     /** save_Number */
     public static final String numberPhone = "number";
     public void save_Number(String NumberPhone) {
         editor.putString(numberPhone, NumberPhone);
         editor.apply();
     }
-    public Map<String, String> save_Number() {
+    public Map<String, String> get_Number() {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put(numberPhone, sharedPreferences.getString(numberPhone, null ));
         return hashMap;
     }
 
     /** Save Status*/
-    public static final String Status_Service = "Status_Services";
-    public void save_Status(boolean statusServic) {
-        editor.putBoolean(Status_Service, statusServic);
+    public static final String status_server = "status_server";
+    public void save_Status(String statusServic) {
+        editor.putString(status_server, statusServic);
         editor.apply();
     }
     public Map<String, String> get_Status() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(Status_Service, String.valueOf(sharedPreferences.getBoolean(Status_Service, false )));
+        hashMap.put(status_server, String.valueOf(sharedPreferences.getBoolean(status_server, false )));
         return hashMap;
     }
 

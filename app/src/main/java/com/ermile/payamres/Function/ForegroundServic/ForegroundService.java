@@ -27,7 +27,8 @@ import com.ermile.payamres.Function.Database.DetabaseToJson.ProducerJSON;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_queue;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_sentsmssaved;
 import com.ermile.payamres.Function.ForegroundServic.ItemAsyncTask.item_smsnewsaved;
-import com.ermile.payamres.Function.SaveDataUser.prival;
+import com.ermile.payamres.Function.SaveDataUser.SaveManager;
+import com.ermile.payamres.Static.prival;
 import com.ermile.payamres.Function.SendSMSToUser;
 import com.ermile.payamres.MainActivity;
 import com.ermile.payamres.R;
@@ -148,10 +149,8 @@ public class ForegroundService extends Service {
     private void SyncSmsToServer(final Context context){
         final String textJsonDatabaseSMS = new ProducerJSON(context).Producer(context);
         /*Get Number Phone */
-        final SharedPreferences save_user = context.getApplicationContext().getSharedPreferences("save_user", MODE_PRIVATE);
-        final Boolean has_number = save_user.getBoolean("has_number", false);
-        final String number_phone = save_user.getString("number_phone", null);
-        if (has_number && number_phone != null){
+        final String number_phone = SaveManager.get(context).get_Number().get(SaveManager.numberPhone);
+        if (number_phone != null){
             StringRequest post_NewSMSSending = new StringRequest(Request.Method.POST, av.url_Sync,
                     new Response.Listener<String>() {
                         @Override
@@ -160,15 +159,53 @@ public class ForegroundService extends Service {
                                 Log.d(av.jsonPost, "ForegroundService: "+response.replace("\n-               ",""));
                                 JSONObject mainObject = new JSONObject(response);
                                 JSONObject result = mainObject.getJSONObject("result");
-                                JSONObject dashboard = result.getJSONObject("dashboard");
+                                if (!result.isNull("status")){
+                                    Boolean status = result.getBoolean("status");
+                                    if (status){
 
+                                    }else {
+
+                                    }
+                                }
+
+                                JSONObject dashboard = result.getJSONObject("dashboard");
                                 /*Set for Nofit Forgrund*/
-                                JSONObject day = dashboard.getJSONObject("day");
-                                String sendTody = day.getString("send");
-                                String receiveTody = day.getString("receive");
-                                String dateTody = day.getString("date");
-                                /*Set ForgroundServic*/
-                                updateNotifForground(dateTody,sendTody,receiveTody);
+                                if (!dashboard.isNull("day")){
+                                    JSONObject day = dashboard.getJSONObject("day");
+                                    String sendTody = day.getString("send");
+                                    String receiveTody = day.getString("receive");
+                                    SaveManager.get(context).save_Day(receiveTody,sendTody);
+                                    /*Set ForgroundServic*/
+                                    String dateTody = day.getString("date");
+                                    updateNotifForground(dateTody,sendTody,receiveTody);
+                                }
+
+                                if (!dashboard.isNull("week")){
+                                    JSONObject week = dashboard.getJSONObject("week");
+                                    String week_send = week.getString("send");
+                                    String week_receive = week.getString("receive");
+                                    SaveManager.get(context).save_week(week_receive,week_send);
+                                }
+
+                                if (!dashboard.isNull("month")){
+                                    JSONObject month = dashboard.getJSONObject("month");
+                                    String month_send = month.getString("send");
+                                    String month_receive = month.getString("receive");
+                                    SaveManager.get(context).save_month(month_receive,month_send);
+                                }
+
+
+                                if (!dashboard.isNull("total")){
+                                    JSONObject total = dashboard.getJSONObject("total");
+                                    String all_send = total.getString("send");
+                                    String all_receive = total.getString("receive");
+                                    SaveManager.get(context).save_all(all_receive,all_send);
+                                }
+
+
+
+
+
 
                                 /* Update GetSMS */
                                 if(!result.isNull("smsnewsaved")){

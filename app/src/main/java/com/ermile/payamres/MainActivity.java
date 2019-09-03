@@ -34,9 +34,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.ermile.payamres.Function.ForegroundServic.ForegroundService;
+import com.ermile.payamres.Function.SaveDataUser.SaveManager;
 import com.ermile.payamres.Static.Network.AppContoroler;
-import com.ermile.payamres.Function.SaveDataUser.prival;
 import com.ermile.payamres.Static.av;
+import com.ermile.payamres.Static.prival;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -153,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
             versionAPP = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
-            txv_versionNumber.setText("12.0.0");
         }
         /*Set Direction RTL*/
         ((GifDrawable)GIFs.getDrawable()).stop();
@@ -172,14 +172,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (servic_smsAI){
+                    servic_smsAI = false;
                     status_CheckBox.setChecked(false);
                     ((GifDrawable)GIFs.getDrawable()).stop();
-                    servic_smsAI = false;
+                    SaveUser_editor.putBoolean("status",servic_smsAI);
+                    SaveUser_editor.apply();
                     SET_STATUS();
                 }else {
                     servic_smsAI = true;
                     ((GifDrawable)GIFs.getDrawable()).start();
                     status_CheckBox.setChecked(true);
+                    SaveUser_editor.putBoolean("status",servic_smsAI);
+                    SaveUser_editor.apply();
                     SET_STATUS();
                 }
             }
@@ -293,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
                 if (number_OK(edt_number)){
                     SaveUser_editor.putBoolean("has_number",true);
                     SaveUser_editor.putString("number_phone",edt_number.getText().toString());
+                    SaveManager.get(getApplicationContext()).save_Number(edt_number.getText().toString());
                     Log.i(TAG,""+edt_number.getText().toString());
                     SaveUser_editor.apply();
                     finish();
@@ -350,10 +355,17 @@ public class MainActivity extends AppCompatActivity {
                                     ((GifDrawable)GIFs.getDrawable()).start();
                                     status_CheckBox.setChecked(true);
                                     servic_smsAI = status;
+
+                                    SaveUser_editor.putBoolean("status",servic_smsAI);
+                                    SaveUser_editor.apply();
+
                                 }else {
                                     ((GifDrawable)GIFs.getDrawable()).stop();
                                     status_CheckBox.setChecked(false);
                                     servic_smsAI = status;
+
+                                    SaveUser_editor.putBoolean("status",servic_smsAI);
+                                    SaveUser_editor.apply();
                                 }
 
                                 JSONObject day = result.getJSONObject("day");

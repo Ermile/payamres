@@ -3,23 +3,23 @@ package com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson;
 import java.util.List;
 
 public class main_jsonObject {
-    boolean status;
+    Boolean status;
     detail_jsonObject detail;
     List<smsnew_jsonArray> smsnew;
     List<sentsms_jsonArray> sentsms;
 
-    public main_jsonObject(boolean status, detail_jsonObject detail) {
+    public main_jsonObject(Boolean status, detail_jsonObject detail) {
         this.status = status;
         this.detail = detail;
         this.smsnew = smsnew;
         this.sentsms = sentsms;
     }
 
-    public boolean isStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 
