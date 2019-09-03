@@ -51,14 +51,14 @@ public class syncSMS {
 
                                 JSONObject dashboard = result.getJSONObject("dashboard");
                                 /*Set for Nofit Forgrund*/
+                                String sendTody,receiveTody,dateTody;
                                 if (!dashboard.isNull("day")){
                                     JSONObject day = dashboard.getJSONObject("day");
-                                    String sendTody = day.getString("send");
-                                    String receiveTody = day.getString("receive");
+                                    sendTody = day.getString("send");
+                                    receiveTody = day.getString("receive");
                                     SaveManager.get(context).save_Day(receiveTody,sendTody);
                                     /*Set ForgroundServic*/
-                                    String dateTody = day.getString("date");
-                                    new ForegroundService().updateNotifForground(dateTody,sendTody,receiveTody);
+                                    dateTody = day.getString("date");
                                 }
 
                                 if (!dashboard.isNull("week")){
@@ -214,7 +214,5 @@ public class syncSMS {
             };
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }
-
-        new SendSMSToUser(context).execute("1");
     }
 }
