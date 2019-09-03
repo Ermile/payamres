@@ -149,13 +149,13 @@ public class MainActivity extends AppCompatActivity {
                     servic_smsAI = false;
                     status_CheckBox.setChecked(false);
                     ((GifDrawable)GIFs.getDrawable()).stop();
-                    new Status().sendToServer(getApplicationContext(),servic_smsAI);
+                    SaveManager.get(getApplicationContext()).save_Status(servic_smsAI);
                     setText();
                 }else {
                     servic_smsAI = true;
                     ((GifDrawable)GIFs.getDrawable()).start();
                     status_CheckBox.setChecked(true);
-                    new Status().sendToServer(getApplicationContext(),servic_smsAI);
+                    SaveManager.get(getApplicationContext()).save_Status(servic_smsAI);
                     setText();
                 }
             }
