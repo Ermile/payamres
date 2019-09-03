@@ -10,6 +10,7 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.ermile.payamres.Function.Database.DatabaseSMS;
+import com.ermile.payamres.Static.av;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -39,7 +40,7 @@ public class IncomingSms extends BroadcastReceiver {
                         idSMS = msgs[i]+"";
                         userDataSMS = msgs[i].getUserData()+"";
 
-                        Log.i(TAG, "Receive SMS - info SMS " +
+                        Log.i(av.tag_GetSMS, "Receive SMS - info SMS " +
                                 "\n number: "+numberSMS+
                                 "\n Massage: "+textSMS+
                                 "\n Time: "+timeSMS+
@@ -49,7 +50,7 @@ public class IncomingSms extends BroadcastReceiver {
 
                         /*Add SMS To Database*/
                         smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
-                        Log.i(TAG, "Query SQL: INSERT > "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
+                        Log.i(av.tagQuery, "Query SQL: INSERT > "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
 
                         /*Log Database*/
                         Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_GetSMS, null);
@@ -59,11 +60,11 @@ public class IncomingSms extends BroadcastReceiver {
                             String text = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("text")) ;
                             String isSend = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("isSendToServer")) ;
                             String serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("serverID")) ;
-                            Log.d(TAG, "Dtabase: "+id+" - number: "+number +" | text: "+text +" | isSendToServer | ServerID: "+isSend +" | "+serverID);
+                            Log.d(av.tag_GetSMS, "Dtabase: "+id+" - number: "+number +" | text: "+text +" | isSendToServer | ServerID: "+isSend +" | "+serverID);
                         }
                     }
                 }catch(Exception e){
-                    Log.e(TAG, "onReceive: -Error  \n"+ e,null );
+                    Log.e(av.tag_GetSMS, "onReceive: -Error  \n"+ e,null );
                 }
             }
         }

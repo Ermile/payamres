@@ -49,7 +49,7 @@ public class Async_queue extends AsyncTask<item_queue, Void , Void> {
                 boolean idIsNew = new SendSMS_Select(context).getServerID(context,id);
                 if (idIsNew){
                     SnedSMS_insert insert = new SnedSMS_insert(context);
-                    insert.insertToSendSMS(context,togateway,text,null,"false","false",id);
+                    insert.insertToSendSMS(context,togateway,text,date,null,"false","false",id);
                     Log.i(av.tag_SendSMS, "A 2- Async_queue Start Function INSERT SMSNew To (Table SendSMS) \n"
                             +"togateway: "+ togateway + " | text: " + text.replace("\n"," ") + " | id: " + id +" | isSendToUser & Server = false");
                 }else {

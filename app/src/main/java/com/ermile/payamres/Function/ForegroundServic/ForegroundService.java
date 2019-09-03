@@ -40,7 +40,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -242,9 +244,10 @@ public class ForegroundService extends Service {
                                             toNumber = objectArray.getString("togateway") ;
                                             text = objectArray.getString("answertext");
                                             ServerID = objectArray.getString("id");
-                                            item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
+                                            String date = DateFormat.getDateTimeInstance().format(new Date());
+                                            item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","",date,"","","","","","","","","");
                                             Log.i(av.tag_SendSMS, "A 1- (queue) Start Async Save SmsNew To 'Table SendSMS' > "+i+" \n "
-                                                    +"ServerID: "+ServerID+" toNumber: "+toNumber+" Massage: "+text.replace("\n"," "));
+                                                    +"ServerID: "+ServerID+" toNumber: "+toNumber+" Massage: "+text.replace("\n"," ")+" | date: "+date);
                                             new Async_queue(context).execute(param_itemQueu);
 
                                         }

@@ -25,6 +25,7 @@ public class DatabaseSMS extends SQLiteAssetHelper {
     public static String sendSMS_localID ="id";
     public static String sendSMS_toNumber ="toNumber";
     public static String sendSMS_text ="text";
+    public static String sendSMS_date ="date";
     public static String sendSMS_smsID ="smsID";
     public static String sendSMS_isSendToUser ="isSendToUser";
     public static String sendSMS_isSendToServer ="isSendToServer";

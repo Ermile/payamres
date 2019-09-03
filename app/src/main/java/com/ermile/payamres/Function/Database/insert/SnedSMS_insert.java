@@ -14,7 +14,7 @@ public class SnedSMS_insert {
         this.context = context;
     }
 
-    public void insertToSendSMS (Context context, String toNumber, String text, String smsID, String isSendToUser, String isSendToServer, String serverID){
+    public void insertToSendSMS (Context context, String toNumber, String text,String date, String smsID, String isSendToUser, String isSendToServer, String serverID){
         Log.d(av.TagInsertDatabase, "insertToSendSMS: "+toNumber + " | " + text + " | " + smsID + " | " + isSendToUser + " | " + isSendToServer + " | " + serverID);
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
@@ -22,6 +22,7 @@ public class SnedSMS_insert {
                 + DatabaseSMS.table_SendSMS + "("
                 + DatabaseSMS.sendSMS_toNumber +","
                 + DatabaseSMS.sendSMS_text + ","
+                + DatabaseSMS.sendSMS_date + ","
                 + DatabaseSMS.sendSMS_smsID + ","
                 + DatabaseSMS.sendSMS_isSendToUser + ","
                 + DatabaseSMS.sendSMS_isSendToServer + ","
@@ -29,6 +30,7 @@ public class SnedSMS_insert {
                 + "Values ("
                 + "'"+toNumber+"',"
                 + " '"+text+"',"
+                + " '"+date+"',"
                 + " '"+smsID+"',"
                 + " '"+isSendToUser+"',"
                 + " '"+isSendToServer+"',"
