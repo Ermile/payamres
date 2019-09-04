@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,7 +21,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,36 +29,14 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.ermile.payamres.Function.Database.Delete.GetSMS_delete;
 import com.ermile.payamres.Function.Database.Delete.SendSMS_delete;
 import com.ermile.payamres.Function.ForegroundServic.ForegroundService;
 import com.ermile.payamres.Function.SaveDataUser.SaveManager;
 import com.ermile.payamres.Function.Status;
 import com.ermile.payamres.Function.syncSMS;
-import com.ermile.payamres.Static.Network.AppContoroler;
 import com.ermile.payamres.Static.av;
 import com.ermile.payamres.Static.prival;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
@@ -83,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setText(){
-        new syncSMS().SyncSmsToServer(getApplicationContext());
         txv_versionNumber = findViewById(R.id.txv_versionNumber);
         tv_numberphone = findViewById(R.id.tv_numberphone);
         tv_todayR = findViewById(R.id.tv_todayR);
@@ -145,19 +121,22 @@ public class MainActivity extends AppCompatActivity {
         status_CheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (servic_smsAI){
-                    servic_smsAI = false;
-                    status_CheckBox.setChecked(false);
-                    ((GifDrawable)GIFs.getDrawable()).stop();
-                    SaveManager.get(getApplicationContext()).save_Status(servic_smsAI);
-                    setText();
+                if (hasInternetConnection()){
+                    if (servic_smsAI){
+                        servic_smsAI = false;
+                        status_CheckBox.setChecked(false);
+                        ((GifDrawable)GIFs.getDrawable()).stop();
+                        new Status().sendToServer(getApplicationContext(),servic_smsAI);
+                    }else {
+                        servic_smsAI = true;
+                        ((GifDrawable)GIFs.getDrawable()).start();
+                        status_CheckBox.setChecked(true);
+                        new Status().sendToServer(getApplicationContext(),servic_smsAI);
+                    }
                 }else {
-                    servic_smsAI = true;
-                    ((GifDrawable)GIFs.getDrawable()).start();
-                    status_CheckBox.setChecked(true);
-                    SaveManager.get(getApplicationContext()).save_Status(servic_smsAI);
-                    setText();
+                    status_CheckBox.setChecked(servic_smsAI);
                 }
+
             }
         });
 
@@ -203,10 +182,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         /*Set Direction RTL*/
-
         Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);
         ViewCompat.setLayoutDirection(Layout_ActivityMain,ViewCompat.LAYOUT_DIRECTION_RTL);
-
+        /*Refresh*/
         Refresh_json = findViewById(R.id.Refresh_json);
         Refresh_json.setRefreshing(false);
         Refresh_json.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -329,19 +307,8 @@ public class MainActivity extends AppCompatActivity {
         {
             return true;
         }
-        Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);
-//        txt_load.setText(title_snackbar);
-        Snackbar snackbar = Snackbar.make(Layout_ActivityMain, "Check Network", Snackbar.LENGTH_INDEFINITE)
-                .setAction("Refresh", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                        startActivity(getIntent());
-                    }
-                });
-        snackbar.setActionTextColor(Color.WHITE);
-        snackbar.setDuration(999999999);
-        snackbar.show();
+        alertDialog("قطع ارتباط","اینترنت خود را بررسی کنید!","باشه",false);
+
         return false;
     }
 
@@ -357,15 +324,25 @@ public class MainActivity extends AppCompatActivity {
                 /*Open Url*/
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                        shareIntent.setType("text/plain");
-                        shareIntent.putExtra(Intent.EXTRA_TEXT,desc);
-                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "The title");
-                        startActivity(Intent.createChooser(shareIntent, "Share..."));
+                        finish();
+                        startActivity(getIntent());
                     }
                 });
         builderSingle.setCancelable(Cancelable);
         builderSingle.show();
+    }
+
+    public void SnacBar(View view, String Title, String Buttone, final Intent intent,Integer Duration){
+        Snackbar snackbar = Snackbar.make(view, Title, Snackbar.LENGTH_INDEFINITE)
+                .setAction(Buttone, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(intent);
+                    }
+                });
+        snackbar.setActionTextColor(Color.YELLOW);
+        snackbar.setDuration(Duration);
+        snackbar.show();
     }
 
 

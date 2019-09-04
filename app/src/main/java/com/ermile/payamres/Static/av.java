@@ -21,7 +21,7 @@ public class av {
 
 
     public static String phone_evazzadeh = "+989357269759";
-    public static String loading = "loading..";
+    public static String loading = "Loading";
 
     public static int min_SendSMS = 1000;
     public static int max_SendSMS = 5000;

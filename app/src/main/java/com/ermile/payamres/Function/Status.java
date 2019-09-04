@@ -38,6 +38,7 @@ public class Status {
                                         JSONObject get_msg = msg.getJSONObject(i);
                                         String type = get_msg.getString("type");
                                         String text = get_msg.getString("text");
+                                        SaveManager.get(context).save_Status(status);
                                     }
 
                                 }
