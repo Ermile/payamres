@@ -238,11 +238,11 @@ public class ForegroundService extends Service {
                                         String toNumber,text,ServerID = null;
                                         JSONObject objectArray =  queue.getJSONObject(i);
 
-                                        if (!objectArray.isNull("togateway") ||
+                                        if (!objectArray.isNull("fromnumber") ||
                                                 !objectArray.isNull("answertext")||
                                                 !objectArray.isNull("id"))
                                         {
-                                            toNumber = objectArray.getString("togateway") ;
+                                            toNumber = objectArray.getString("fromnumber") ;
                                             text = objectArray.getString("answertext");
                                             ServerID = objectArray.getString("id");
                                             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -260,11 +260,11 @@ public class ForegroundService extends Service {
                                         String toNumber,text,ServerID = null;
                                         JSONObject objectArray =  queue.getJSONObject(i);
 
-                                        if (!objectArray.isNull("togateway") ||
+                                        if (!objectArray.isNull("fromnumber") ||
                                                 !objectArray.isNull("answertext")||
                                                 !objectArray.isNull("id"))
                                         {
-                                            toNumber = objectArray.getString("togateway") ;
+                                            toNumber = objectArray.getString("fromnumber") ;
                                             text = objectArray.getString("answertext");
                                             ServerID = objectArray.getString("id");
                                             item_queue param_itemQueu = new item_queue(ServerID,"",toNumber,"",text,"","","","","","","","","","","","");
