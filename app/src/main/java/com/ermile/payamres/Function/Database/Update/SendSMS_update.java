@@ -8,13 +8,8 @@ import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Static.av;
 
 public class SendSMS_update {
-    Context context;
 
-    public SendSMS_update(Context context) {
-        this.context = context;
-    }
-
-    public void SendToServer(Context context,String localID,String smsID,String serverID,String isSendToServer){
+    public static void SendToServer(Context context,String localID,String smsID,String serverID,String isSendToServer){
         Log.d(av.TagUpdateDatabase, "SendSMS_update (isSendToServer):  "+localID +" | "+smsID + " | "+serverID + " | "+isSendToServer);
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
@@ -29,7 +24,7 @@ public class SendSMS_update {
         smsDatabase.close();
     }
 
-    public void SendToUser(Context context,String localID,String smsID,String serverID,String isSendToUser){
+    public static void SendToUser(Context context,String localID,String smsID,String serverID,String isSendToUser){
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
         String query = "UPDATE "+ DatabaseSMS.table_SendSMS +

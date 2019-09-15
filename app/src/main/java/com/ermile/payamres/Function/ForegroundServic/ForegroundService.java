@@ -18,6 +18,7 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.ermile.payamres.Function.AsyncTask.Async_queue;
@@ -40,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,6 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ForegroundService extends Service {
+    int i = 0;
     /*Static Value*/
     private static String TAG = "ForegroundService";
     String link_newSMS = "https://khadije.com/api/v6/smsapp/queue";
@@ -69,16 +72,16 @@ public class ForegroundService extends Service {
     NotificationManagerCompat notificationManager ;
 
 
-    /*Handler 10sec*/
+    /*Handler 60sec*/
     boolean powerServic = false;
     Handler handler = new Handler();
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            Log.d(TAG, "run LastSMSSending ,"+" power Service is : "+powerServic);
+            Log.d(av.iTag, "run LastSMSSending ,"+" power Service is : "+powerServic);
             if (powerServic){
                 /*Run Send SMS*/
-                SyncSmsToServer(getApplicationContext());
+                SyncSmsToServer();
                 handler.postDelayed(runnable, 60000);
             }
         }
@@ -112,7 +115,7 @@ public class ForegroundService extends Service {
         if (!powerServic){
             powerServic = true;
             handler.postDelayed(runnable, 0);
-            Log.d(TAG, "handler.postDelayed "+" --> "+powerServic);
+            Log.d(av.iTag, "handler.postDelayed "+" --> "+powerServic);
         }
         return START_NOT_STICKY;
     }
@@ -149,12 +152,13 @@ public class ForegroundService extends Service {
     }
 
 
-    private void SyncSmsToServer(final Context context){
+    private void SyncSmsToServer(){
+        final Context context = ForegroundService.this;
         final String textJsonDatabaseSMS = new ProducerJSON(context).Producer(context);
         /*Get Number Phone */
         final String number_phone = SaveManager.get(context).get_Number().get(SaveManager.numberPhone);
         if (number_phone != null){
-            StringRequest post_NewSMSSending = new StringRequest(Request.Method.POST, av.url_Sync,
+            final StringRequest post_NewSMSSending = new StringRequest(Request.Method.POST, av.url_Sync,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -170,7 +174,6 @@ public class ForegroundService extends Service {
 
                                     }
                                 }
-
                                 JSONObject dashboard = result.getJSONObject("dashboard");
                                 /*Set for Nofit Forgrund*/
                                 if (!dashboard.isNull("day")){
@@ -299,12 +302,14 @@ public class ForegroundService extends Service {
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                Log.e(av.iTag, "JSONException: "+e);
                             }
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e(TAG , "new sms > error");
+                    Log.e(av.iTag, "onErrorResponse: "+error);
                 }
             }) {
 
@@ -318,22 +323,40 @@ public class ForegroundService extends Service {
                 }
 
                 @Override
+                public String getBodyContentType() {
+                    Log.d(av.iTag, "getBodyContentType: "+ textJsonDatabaseSMS);
+                    return "application/json; charset=utf-8";
+                }
+
+                 @Override
                 public byte[] getBody() throws AuthFailureError {
-                    byte[] body = new byte[0];
-                    try {
-                        body = textJsonDatabaseSMS.getBytes("UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        Log.e(av.iTag, "Unable to gets bytes from JSON", e.fillInStackTrace());
-                    }
-                    return body;
+                    byte[] body ;
+                     body = textJsonDatabaseSMS.getBytes(StandardCharsets.UTF_8);
+                     return body;
+                }
+            };
+
+
+            post_NewSMSSending.setRetryPolicy(new RetryPolicy() {
+                @Override
+                public int getCurrentTimeout() {
+                    Log.d(av.iTag, "getCurrentTimeout: ");
+                    return 0;
                 }
 
                 @Override
-                public String getBodyContentType() {
-                    Log.d(av.iTag, "getBodyContentType: "+ textJsonDatabaseSMS);
-                    return "application/json";
+                public int getCurrentRetryCount() {
+                    Log.d(av.iTag, "getCurrentRetryCount: ");
+                    return 0;
                 }
-            };
+
+                @Override
+                public void retry(VolleyError error) throws VolleyError {
+                    Log.d(av.iTag, "retry: "+error);
+
+                }
+            });
+
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }
 

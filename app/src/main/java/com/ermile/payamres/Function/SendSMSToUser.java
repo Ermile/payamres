@@ -36,7 +36,6 @@ public class SendSMSToUser extends AsyncTask<String, Void , Void> {
             Log.i(av.tag_SendSMS, "B 4- Get Table 'SendSMS' count: "+getSendSMS.getCount()
                     +" --> if (isSendToUser = false)"
                     +"\n Query: "+query);
-            SendSMS_update update = new SendSMS_update(context);
             while (getSendSMS.moveToNext()){
                 String id,number,massage,smsID,serverID;
                 id = getSendSMS.getString(getSendSMS.getColumnIndex(DatabaseSMS.sendSMS_localID)) ;
@@ -52,12 +51,12 @@ public class SendSMSToUser extends AsyncTask<String, Void , Void> {
                     Log.i(av.tag_SendSMS, "B 5- Send SMS To User \n"
                             +"number: "+number +" | Massage: "+massage.replace("\n"," ")+" Sleep Code "+timeSleep+" MilSec");
 
-                    update.SendToUser(context,id,smsID,serverID,"true");
+                    SendSMS_update.SendToUser(context,id,smsID,serverID,"true");
                     Log.i(av.tag_SendSMS, "B 6- start Function Update for (Update Table SendSMS 'isSendToUser = true') \n"
                             +"Id: "+id+" | Smsid: "+smsID+" | Serverid: "+serverID+" | isSendToUser: 'true' ");
 
                 } catch (Exception e) {
-                    update.SendToUser(context,id,smsID,serverID,"false");
+                    SendSMS_update.SendToUser(context,id,smsID,serverID,"false");
                     Log.e(av.tag_SendSMS, "B 5- Send SMS To User \n ERROR > "+e);
                 }
 

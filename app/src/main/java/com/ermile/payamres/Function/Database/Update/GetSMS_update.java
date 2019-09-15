@@ -9,14 +9,7 @@ import com.ermile.payamres.Static.av;
 
 public class GetSMS_update {
 
-    Context context;
-
-    public GetSMS_update(Context context) {
-        this.context = context;
-    }
-
-
-    public void serverID(Context context ,String localID, String smsID, String serverID){
+    public static void serverID(Context context ,String localID, String smsID, String serverID){
         Log.d(av.TagUpdateDatabase, "GetSMS_update serverID:  "+localID +" | "+smsID + " | "+serverID);
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();

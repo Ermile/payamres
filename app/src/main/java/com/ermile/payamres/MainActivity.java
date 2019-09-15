@@ -34,9 +34,9 @@ import com.ermile.payamres.Function.Database.Delete.SendSMS_delete;
 import com.ermile.payamres.Function.ForegroundServic.ForegroundService;
 import com.ermile.payamres.Function.SaveDataUser.SaveManager;
 import com.ermile.payamres.Function.Status;
-import com.ermile.payamres.Function.syncSMS;
 import com.ermile.payamres.Static.av;
 import com.ermile.payamres.Static.prival;
+
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 

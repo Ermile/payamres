@@ -9,12 +9,8 @@ import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Static.av;
 
 public class SendSMS_Select {
-    Context context;
-    public SendSMS_Select(Context context) {
-        this.context = context;
-    }
 
-    public boolean getServerID(Context context,String ServerID){
+    public static boolean getServerID(Context context,String ServerID){
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
         Cursor getID = smsDatabase.rawQuery(
                 " SELECT "+DatabaseSMS.sendSMS_serverID
@@ -27,6 +23,8 @@ public class SendSMS_Select {
             Log.d(av.pTag, "getServerID (SendSMS): "+id);
             return false;
         }
+        getID.close();
+        smsDatabase.close();
         return true;
     }
 

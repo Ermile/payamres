@@ -17,7 +17,7 @@ public class av {
     public static String link_status = "https://khadije.com/api/v6/smsapp/status";
     public static String link_dashboard = "https://khadije.com/api/v6/smsapp/dashboard";
 
-    public static String url_Sync = "https://khadije.com/fa/api/v6/smsapp/sync";
+    public static String url_Sync = "https://khadije.com/fa/api/v6/smsapp/sync2";
 
 
     public static String phone_evazzadeh = "+989357269759";

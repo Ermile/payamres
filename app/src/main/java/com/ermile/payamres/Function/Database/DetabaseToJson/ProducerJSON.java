@@ -67,6 +67,7 @@ public class ProducerJSON {
 
             if (infoDatabaseSMS.getCount() == 0){
                 mainJsonObject.setSmsnew(smsNew);
+                infoDatabaseSMS.close();
             }else {
                 while (infoDatabaseSMS.moveToNext()) {
                     String id,number,text,date,smsID,userData,isSendToServer,serverID = null;
@@ -84,6 +85,7 @@ public class ProducerJSON {
 
                 }
                 smsDatabase.close();
+                infoDatabaseSMS.close();
             }
             GetSMS_Sent(context,mainJsonObject);
         }catch (Exception error){
@@ -104,6 +106,7 @@ public class ProducerJSON {
 
             if (infoDatabaseSMS.getCount() == 0){
                 mainJsonObject.setSentsms(smsSent);
+                infoDatabaseSMS.close();
             }else {
                 while (infoDatabaseSMS.moveToNext()) {
                     String id,smsID,serverID = null;
@@ -117,6 +120,7 @@ public class ProducerJSON {
                     Log.d(av.pTag, "json crated > smsSent[] "+ id +" | "+ smsID +" | "+ serverID );
                 }
                 smsDatabase.close();
+                infoDatabaseSMS.close();
             }
         }catch (Exception error){
             Log.e(av.pTag, "GetSMS_Sent from database : "+error,null );

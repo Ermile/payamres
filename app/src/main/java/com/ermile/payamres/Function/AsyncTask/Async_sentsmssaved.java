@@ -31,8 +31,7 @@ public class Async_sentsmssaved extends AsyncTask<item_sentsmssaved, Void , Void
             String Serverid = p.getServerid();
             String isSendToServer = p.getStatus();
             try {
-                SendSMS_update update = new SendSMS_update(context);
-                update.SendToServer(context, Localid, Smsid, Serverid,isSendToServer);
+                SendSMS_update.SendToServer(context, Localid, Smsid, Serverid,isSendToServer);
                 Log.d(av.tag_SendSMS, "10- Async_SentSmsSaved : "+ Localid + " | " + Smsid+ " | " + Serverid );
 
             } catch (Exception error) {

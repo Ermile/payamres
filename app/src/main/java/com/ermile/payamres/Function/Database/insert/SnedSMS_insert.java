@@ -8,13 +8,8 @@ import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Static.av;
 
 public class SnedSMS_insert {
-    Context context;
 
-    public SnedSMS_insert(Context context) {
-        this.context = context;
-    }
-
-    public void insertToSendSMS (Context context, String toNumber, String text,String date, String smsID, String isSendToUser, String isSendToServer, String serverID){
+    public static void insertToSendSMS (Context context, String toNumber, String text,String date, String smsID, String isSendToUser, String isSendToServer, String serverID){
         Log.d(av.TagInsertDatabase, "insertToSendSMS: "+toNumber + " | " + text + " | " + smsID + " | " + isSendToUser + " | " + isSendToServer + " | " + serverID);
 
         SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
