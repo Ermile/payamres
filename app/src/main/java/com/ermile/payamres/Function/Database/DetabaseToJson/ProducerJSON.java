@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.ermile.payamres.Function.AsyncTask.Async_lostSMS;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.detail_jsonObject;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.lostSMS_jsonArray;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.main_jsonObject;
@@ -166,6 +167,8 @@ public class ProducerJSON {
                     userData = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_userData));
                     isSendToServer = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_isSendToServer));
                     serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_serverID));
+
+                    new Async_lostSMS(context).execute(id);
 
                     lostSMS.add(new lostSMS_jsonArray(id, number, text, date, smsID, userData, brand, model, SimSerialNumber));
                     mainJsonObject.setLostsms(lostSMS);

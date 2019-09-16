@@ -61,9 +61,9 @@ public class IncomingSms extends BroadcastReceiver {
                         textSMS = textSMS + msgs[i].getMessageBody();
 
                     }
-                    textForMD5= numberSMS+timeSMS+textSMS+userDataSMS+timeJAVA;
+                    textForMD5= idSMS+numberSMS+timeSMS+textSMS+userDataSMS+timeJAVA;
                     /*Add SMS To Database*/
-                    smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,convertStringToMD5(textForMD5),userDataSMS,"false"));
+                    smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false","false",convertStringToMD5(textForMD5)));
                     smsDatabase.close();
                     Log.i(av.iTags, "- MD5: "+convertStringToMD5(textForMD5) +
                             "\nID: "+textForMD5+
@@ -78,13 +78,15 @@ public class IncomingSms extends BroadcastReceiver {
     }
 
 
-    private String insertToGetSMS (String number,String text,String date,String smsID,String userData,String isSendToServer){
+    private String insertToGetSMS (String number,String text,String date,String smsID,String userData,String firstSendToServer,String isSendToServer,String MD5){
         return "INSERT INTO "+ DatabaseSMS.table_GetSMS
                 + "("+ DatabaseSMS.getSMS_number +","
                 + DatabaseSMS.getSMS_text + ","
                 + DatabaseSMS.getSMS_date + ","
                 + DatabaseSMS.getSMS_smsID + ","
                 + DatabaseSMS.getSMS_userData + ","
+                + DatabaseSMS.getSMS_firstSendToServer +","
+                + DatabaseSMS.getSMS_MD5 +","
                 + DatabaseSMS.getSMS_isSendToServer +")"
 
                 + "Values (" +
@@ -93,6 +95,8 @@ public class IncomingSms extends BroadcastReceiver {
                 " '"+date+"'," +
                 " '"+smsID+"'," +
                 " '"+userData+"'," +
+                " '"+firstSendToServer+ "',"+
+                " '"+MD5+ "',"+
                 " '"+isSendToServer+"' )";
 
     }

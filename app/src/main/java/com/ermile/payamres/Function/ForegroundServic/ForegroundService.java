@@ -234,6 +234,25 @@ public class ForegroundService extends Service {
                                         }
                                     }
                                 }
+                                if(!result.isNull("lostresult")){
+                                    JSONArray smsNewSaved = result.getJSONArray("lostresult");
+                                    for (int i = 0; i < smsNewSaved.length(); i++) {
+                                        String localID,smsID,ServerID = null;
+                                        JSONObject objectArray =  smsNewSaved.getJSONObject(i);
+                                        if (!objectArray.isNull("localid") ||
+                                                !objectArray.isNull("smsid")||
+                                                !objectArray.isNull("serverid"))
+                                        {
+                                            localID = objectArray.getString("localid");
+                                            smsID = objectArray.getString("smsid");
+                                            ServerID = objectArray.getString("serverid");
+
+                                            item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,ServerID);
+                                            Log.i(av.tag_GetSMS, "1- lostresult : "+ localID+" | "+smsID+" | "+ServerID);
+                                            new Async_smsnewsaved(context).execute(param_smsnewsaved);
+                                        }
+                                    }
+                                }
 
                                 /* New SMS */
                                 if (!result.isNull("queue")){

@@ -19,6 +19,7 @@ public class DatabaseSMS extends SQLiteAssetHelper {
     public static String getSMS_isSendToServer ="isSendToServer";
     public static String getSMS_firstSendToServer ="firstSendToServer";
     public static String getSMS_serverID ="serverID";
+    public static String getSMS_MD5 ="MD5";
 
 
     /*Table Send SMS*/
