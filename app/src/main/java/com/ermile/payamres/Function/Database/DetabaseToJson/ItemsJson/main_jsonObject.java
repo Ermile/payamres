@@ -7,12 +7,14 @@ public class main_jsonObject {
     detail_jsonObject detail;
     List<smsnew_jsonArray> smsnew;
     List<sentsms_jsonArray> sentsms;
+    List<lostSMS_jsonArray> lostsms;
 
     public main_jsonObject(Boolean status, detail_jsonObject detail) {
         this.status = status;
         this.detail = detail;
         this.smsnew = smsnew;
         this.sentsms = sentsms;
+        this.lostsms = lostsms;
     }
 
     public Boolean getStatus() {
@@ -45,5 +47,13 @@ public class main_jsonObject {
 
     public void setSentsms(List<sentsms_jsonArray> sentsms) {
         this.sentsms = sentsms;
+    }
+
+    public List<lostSMS_jsonArray> getLostsms() {
+        return lostsms;
+    }
+
+    public void setLostsms(List<lostSMS_jsonArray> lostsms) {
+        this.lostsms = lostsms;
     }
 }

@@ -5,7 +5,8 @@ import java.util.Date;
 
 public class av {
     public static String pTag = "AllLogForPayamresApp";
-    public static String iTag = "ImportantLogForPayamresApp";
+    public static String iTag = "ImportantLogForPayamresAppItagImporms";
+    public static String iTags = "ImportantLogForPayamresApps";
     public static String tagQuery = "AllLogQueryForPayamresApp";
     public static String jsonPost = "jsonPostLogForPayamresApp";
     public static String TagAsync = "AsyncTaskPayamresApp";

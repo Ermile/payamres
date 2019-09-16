@@ -16,6 +16,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
@@ -163,7 +164,7 @@ public class ForegroundService extends Service {
                         @Override
                         public void onResponse(String response) {
                             try {
-                                Log.d(av.jsonPost, "ForegroundService: "+response.replace("\n-               ",""));
+                                Log.d(TAG, "onResponse: "+ response);
                                 JSONObject mainObject = new JSONObject(response);
                                 JSONObject result = mainObject.getJSONObject("result");
                                 if (!result.isNull("status")){
@@ -302,14 +303,13 @@ public class ForegroundService extends Service {
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                Log.e(av.iTag, "JSONException: "+e);
+                                Log.e(TAG, "JSONException: "+e);
                             }
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG , "new sms > error");
-                    Log.e(av.iTag, "onErrorResponse: "+error);
+                    Log.e(TAG , "onErrorResponse > error: "+error);
                 }
             }) {
 
@@ -318,13 +318,13 @@ public class ForegroundService extends Service {
                     HashMap<String, String> header = new HashMap<>();
                     header.put("smsappkey", prival.keyapp);
                     header.put("gateway", number_phone);
-                    Log.d(TAG , "Send Header");
+                    Log.d(TAG , "Send Header \n"+header);
                     return header;
                 }
 
                 @Override
                 public String getBodyContentType() {
-                    Log.d(av.iTag, "getBodyContentType: "+ textJsonDatabaseSMS);
+                    Log.d(TAG, "getBodyContentType: "+ textJsonDatabaseSMS);
                     return "application/json; charset=utf-8";
                 }
 
@@ -335,27 +335,7 @@ public class ForegroundService extends Service {
                      return body;
                 }
             };
-
-
-            post_NewSMSSending.setRetryPolicy(new RetryPolicy() {
-                @Override
-                public int getCurrentTimeout() {
-                    Log.d(av.iTag, "getCurrentTimeout: ");
-                    return 0;
-                }
-
-                @Override
-                public int getCurrentRetryCount() {
-                    Log.d(av.iTag, "getCurrentRetryCount: ");
-                    return 0;
-                }
-
-                @Override
-                public void retry(VolleyError error) throws VolleyError {
-                    Log.d(av.iTag, "retry: "+error);
-
-                }
-            });
+            post_NewSMSSending.setRetryPolicy(new DefaultRetryPolicy(3 * 1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }

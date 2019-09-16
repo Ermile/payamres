@@ -61,6 +61,8 @@ public class SendSMSToUser extends AsyncTask<String, Void , Void> {
                 }
 
             }
+            getSendSMS.close();
+            smsDatabase.close();
         }
         return null;
     }
