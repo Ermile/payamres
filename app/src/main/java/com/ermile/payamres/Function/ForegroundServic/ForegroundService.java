@@ -359,7 +359,7 @@ public class ForegroundService extends Service {
             AppContoroler.getInstance().addToRequestQueue(post_NewSMSSending);
         }
 
-        new SendSMSToUser(context).execute("1");
+       // new SendSMSToUser(context).execute("");
     }
 
 

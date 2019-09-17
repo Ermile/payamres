@@ -6,7 +6,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class DatabaseSMS extends SQLiteAssetHelper {
 
-    private static final String DATABASE_NAME = "PayamresDatabase.db";
+    private static final String DATABASE_NAME = "Payamres.db";
 
     /*Table Get SMS*/
     public static String table_GetSMS = "GetSMS";

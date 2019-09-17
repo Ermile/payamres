@@ -69,6 +69,8 @@ public class IncomingSms extends BroadcastReceiver {
                             "\nID: "+textForMD5+
                             "\n text: "+textSMS+
                             "\n ---------------------------------Finish--------------------------------------");
+                    Log.i(av.iTags, "- Query: "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false","false",convertStringToMD5(textForMD5))+
+                            "\n ---------------------------------Query--------------------------------------");
 
                 }catch(Exception e){
                     Log.e(av.tag_GetSMS, "onReceive: -Error  \n"+ e,null );
@@ -78,26 +80,26 @@ public class IncomingSms extends BroadcastReceiver {
     }
 
 
-    private String insertToGetSMS (String number,String text,String date,String smsID,String userData,String firstSendToServer,String isSendToServer,String MD5){
+    private String insertToGetSMS (String number,String text,String date,String smsID,String userData,String isSendToServer ,String firstSendToServer,String MD5){
         return "INSERT INTO "+ DatabaseSMS.table_GetSMS
                 + "("+ DatabaseSMS.getSMS_number +","
                 + DatabaseSMS.getSMS_text + ","
                 + DatabaseSMS.getSMS_date + ","
                 + DatabaseSMS.getSMS_smsID + ","
                 + DatabaseSMS.getSMS_userData + ","
+                + DatabaseSMS.getSMS_isSendToServer +","
                 + DatabaseSMS.getSMS_firstSendToServer +","
-                + DatabaseSMS.getSMS_MD5 +","
-                + DatabaseSMS.getSMS_isSendToServer +")"
+                + DatabaseSMS.getSMS_MD5 +")"
 
                 + "Values (" +
-                "'"+number+"'," +
-                " '"+text+"'," +
-                " '"+date+"'," +
-                " '"+smsID+"'," +
-                " '"+userData+"'," +
-                " '"+firstSendToServer+ "',"+
-                " '"+MD5+ "',"+
-                " '"+isSendToServer+"' )";
+                " '"+number+"' ," +
+                " '"+text+"'   ," +
+                " '"+date+"'   ," +
+                " '"+smsID+"'  ," +
+                " '"+userData+"' ," +
+                " '"+isSendToServer+ "'    ,"+
+                " '"+firstSendToServer+ "' ,"+
+                " '"+MD5+"' )";
 
     }
 
