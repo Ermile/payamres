@@ -26,7 +26,12 @@ public class IncomingSms extends BroadcastReceiver {
             Log.i(TAG, "onReceive -Start");
             Bundle bundle = intent.getExtras();
             SmsMessage[] msgs = null;
-            String numberSMS,textSMS,timeSMS,idSMS,userDataSMS;
+            String numberSMS = null
+                    ,textSMS = ""
+                    ,timeSMS = null
+                    ,idSMS = null
+                    ,userDataSMS = null
+                    ,md5 = null;
             if (bundle != null){
                 //---retrieve the SMS message received---
                 try{
@@ -34,38 +39,21 @@ public class IncomingSms extends BroadcastReceiver {
                     msgs = new SmsMessage[pdus.length];
                     for(int i=0; i<msgs.length; i++){
                         msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-
-                        numberSMS = msgs[i].getOriginatingAddress();
-                        textSMS = msgs[i].getMessageBody();
-
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                        timeSMS = simpleDateFormat.format(new Date());
-                        idSMS = msgs[i]+"";
-                        userDataSMS = msgs[i].getUserData()+"";
-
-                        Log.i(av.tag_GetSMS, "Receive SMS - info SMS " +
-                                "\n number: "+numberSMS+
-                                "\n Massage: "+textSMS+
-                                "\n Time: "+timeSMS+
-                                "\n SMS-ID: "+idSMS+
-                                "\n UserData: "+userDataSMS +
-                                "\n ---------------------------------Finish--------------------------------------");
-
-                        /*Add SMS To Database*/
-                        smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
-                        Log.i(av.tagQuery, "Query SQL: INSERT > "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
-
-                        /*Log Database*/
-                        Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_GetSMS, null);
-                        while (infoDatabaseSMS.moveToNext()) {
-                            int id = infoDatabaseSMS.getInt(infoDatabaseSMS.getColumnIndex("id")) ;
-                            String number = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("number")) ;
-                            String text = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("text")) ;
-                            String isSend = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("isSendToServer")) ;
-                            String serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex("serverID")) ;
-                            Log.d(av.tag_GetSMS, "Dtabase: "+id+" - number: "+number +" | text: "+text +" | isSendToServer | ServerID: "+isSend +" | "+serverID);
+                        if (i == 0){
+                            numberSMS = msgs[i].getOriginatingAddress();
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                            timeSMS = simpleDateFormat.format(new Date());
+                            idSMS = msgs[i]+"";
+                            userDataSMS = msgs[i].getUserData()+"";
                         }
+                        textSMS = textSMS + msgs[i].getMessageBody();
+
+
                     }
+                    /*Add SMS To Database*/
+                    smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
+                    Log.i(av.tagQuery, "Query SQL: INSERT > "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
+                    smsDatabase.close();
                 }catch(Exception e){
                     Log.e(av.tag_GetSMS, "onReceive: -Error  \n"+ e,null );
                 }
