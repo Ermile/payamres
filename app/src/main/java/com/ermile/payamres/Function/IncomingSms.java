@@ -12,6 +12,8 @@ import android.util.Log;
 import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Static.av;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,7 +22,7 @@ public class IncomingSms extends BroadcastReceiver {
     private static String TAG = "IncomingSms";
 
     public void onReceive(final Context context, Intent intent) {
-        final SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+
 
         if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
             Log.i(TAG, "onReceive -Start");
@@ -47,13 +49,15 @@ public class IncomingSms extends BroadcastReceiver {
                             userDataSMS = msgs[i].getUserData()+"";
                         }
                         textSMS = textSMS + msgs[i].getMessageBody();
-
-
                     }
+
+                    String textMD5 = numberSMS+textSMS+idSMS+userDataSMS+textSMS;
+
                     /*Add SMS To Database*/
-                    smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
-                    Log.i(av.tagQuery, "Query SQL: INSERT > "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false",null));
+                    SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+                    smsDatabase.execSQL(insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false","false",md5(textMD5)));
                     smsDatabase.close();
+                    Log.i(av.tagQuery, "Query SQL: INSERT > "+insertToGetSMS(numberSMS,textSMS,timeSMS,idSMS,userDataSMS,"false","false",md5(textMD5)));
                 }catch(Exception e){
                     Log.e(av.tag_GetSMS, "onReceive: -Error  \n"+ e,null );
                 }
@@ -61,17 +65,41 @@ public class IncomingSms extends BroadcastReceiver {
         }
     }
 
+    private static String md5(final String s) {
+        final String MD5 = "MD5";
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest
+                    .getInstance(MD5);
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
 
-    private String insertToGetSMS (String number,String text,String date,String smsID,String userData,String isSendToServer,String serverID){
-        String getSMS_insert =
-                "INSERT INTO "+ DatabaseSMS.table_GetSMS
+            // Create Hex String
+            StringBuilder hexString = new StringBuilder();
+            for (byte aMessageDigest : messageDigest) {
+                String h = Integer.toHexString(0xFF & aMessageDigest);
+                while (h.length() < 2)
+                    h = "0" + h;
+                hexString.append(h);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null ;
+        }
+    }
+
+    private String insertToGetSMS (String number,String text,String date,String smsID,String userData,String isSendToServer,String firstSendServer,String MD5){
+        return "INSERT INTO "+ DatabaseSMS.table_GetSMS
                         + "("+ DatabaseSMS.getSMS_number +","
                         + DatabaseSMS.getSMS_text + ","
                         + DatabaseSMS.getSMS_date + ","
                         + DatabaseSMS.getSMS_smsID + ","
                         + DatabaseSMS.getSMS_userData + ","
                         + DatabaseSMS.getSMS_isSendToServer + ","
-                        + DatabaseSMS.getSMS_serverID + ")"
+                        + "firstSendToServer" + ","
+                        + "MD5" + ")"
 
                         + "Values (" +
                         "'"+number+"'," +
@@ -80,9 +108,8 @@ public class IncomingSms extends BroadcastReceiver {
                         " '"+smsID+"'," +
                         " '"+userData+"'," +
                         " '"+isSendToServer+"'," +
-                        " '"+serverID+"' )";
-
-        return getSMS_insert;
+                        " '"+firstSendServer+"'," +
+                        " '"+MD5+"' )";
 
     }
 }

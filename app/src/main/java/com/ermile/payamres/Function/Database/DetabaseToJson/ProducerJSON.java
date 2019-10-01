@@ -14,6 +14,7 @@ import android.util.Log;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.detail_jsonObject;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.main_jsonObject;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.sentsms_jsonArray;
+import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.smslost_jsonArray;
 import com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson.smsnew_jsonArray;
 import com.ermile.payamres.Function.Database.DatabaseSMS;
 import com.ermile.payamres.Function.SaveDataUser.SaveManager;
@@ -61,44 +62,105 @@ public class ProducerJSON {
             final String model = Build.MODEL;
 
             List<smsnew_jsonArray> smsNew = new ArrayList<>();
+            List<smslost_jsonArray> smslost = new ArrayList<>();
 
-            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
-            Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_GetSMS + " WHERE "+DatabaseSMS.getSMS_isSendToServer+ " = 'false' ", null);
+            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getReadableDatabase();
+            Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_GetSMS + " WHERE "
+                    +DatabaseSMS.getSMS_serverID+" is null AND "
+                    +DatabaseSMS.getSMS_isSendToServer+ " = 'false' AND "
+                    +DatabaseSMS.getSMS_firstSendToServer +"= 'false'", null);
 
             if (infoDatabaseSMS.getCount() == 0){
+                GetSMS_lost(context,mainJsonObject);
                 mainJsonObject.setSmsnew(smsNew);
                 infoDatabaseSMS.close();
+                smsDatabase.close();
             }else {
+                mainJsonObject.setSmslost(smslost);
                 while (infoDatabaseSMS.moveToNext()) {
-                    String id,number,text,date,smsID,userData,isSendToServer,serverID = null;
+                    String id,number,text,date,smsID,userData,isSendToServer,serverID,MD5 = null;
                     id = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_localID)) ;
                     number = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_number)) ;
                     text = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_text)) ;
                     date = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_date)) ;
                     smsID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_smsID)) ;
                     userData = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_userData)) ;
+                    MD5 = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_MD5)) ;
                     isSendToServer = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_isSendToServer)) ;
                     serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_serverID)) ;
 
-                    smsNew.add(new smsnew_jsonArray(id,number,text,date,smsID,userData,brand,model,SimSerialNumber));
+                    String query = "UPDATE GetSMS SET firstSendToServer = 'true' WHERE id = "+id+" ";
+                    SQLiteDatabase smsDatabase_lost = new DatabaseSMS(context).getWritableDatabase();
+                    smsDatabase_lost.execSQL(query);
+                    smsDatabase_lost.close();
+                    Log.d(av.iTag, "query------------------------------------------>\n\n: "+query);
+
+                    smsNew.add(new smsnew_jsonArray(id,number,text,date,smsID,userData,MD5,brand,model,SimSerialNumber));
                     mainJsonObject.setSmsnew(smsNew);
 
                 }
                 smsDatabase.close();
                 infoDatabaseSMS.close();
             }
-            GetSMS_Sent(context,mainJsonObject);
+            SendSMS_Sent(context,mainJsonObject);
         }catch (Exception error){
             Log.e(av.pTag, "Get SMS Send from database: "+error,null);
         }
 
     }
 
-    private void GetSMS_Sent (Context context,main_jsonObject mainJsonObject){
+    private void  GetSMS_lost(Context context,main_jsonObject mainJsonObject){
+        try {
+            String SimSerialNumber = null;
+            TelephonyManager telemamanger = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                SimSerialNumber = telemamanger.getSimSerialNumber();
+            }
+            final String brand = Build.BRAND;
+            final String model = Build.MODEL;
+
+            List<smslost_jsonArray> smslost = new ArrayList<>();
+
+            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getReadableDatabase();
+            Cursor infoDatabaseSMS = smsDatabase.rawQuery("SELECT * FROM "+DatabaseSMS.table_GetSMS + " WHERE "+DatabaseSMS.getSMS_serverID+ " is null AND "
+                    +DatabaseSMS.getSMS_firstSendToServer +"= 'true'", null);
+
+            if (infoDatabaseSMS.getCount() == 0){
+                mainJsonObject.setSmslost(smslost);
+                infoDatabaseSMS.close();
+                smsDatabase.close();
+            }else {
+                while (infoDatabaseSMS.moveToNext()) {
+                    String id,number,text,date,smsID,userData,isSendToServer,serverID,MD5 = null;
+                    id = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_localID)) ;
+                    number = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_number)) ;
+                    text = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_text)) ;
+                    date = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_date)) ;
+                    smsID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_smsID)) ;
+                    userData = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_userData)) ;
+                    MD5 = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_MD5)) ;
+                    isSendToServer = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_isSendToServer)) ;
+                    serverID = infoDatabaseSMS.getString(infoDatabaseSMS.getColumnIndex(DatabaseSMS.getSMS_serverID)) ;
+
+                    smslost.add(new smslost_jsonArray(id,number,text,date,smsID,userData,MD5,brand,model,SimSerialNumber));
+                    mainJsonObject.setSmslost(smslost);
+
+                }
+                smsDatabase.close();
+                infoDatabaseSMS.close();
+            }
+            SendSMS_Sent(context,mainJsonObject);
+        }catch (Exception error){
+            Log.e(av.pTag, "Get SMS Send from database: "+error,null);
+        }
+
+    }
+
+    private void SendSMS_Sent (Context context,main_jsonObject mainJsonObject){
         try {
             List<sentsms_jsonArray> smsSent = new ArrayList<>();
 
-            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getReadableDatabase();
             Cursor infoDatabaseSMS = smsDatabase.rawQuery(
                     "SELECT * FROM "+DatabaseSMS.table_SendSMS+" WHERE "
                     +DatabaseSMS.sendSMS_isSendToUser +" = 'true' "
@@ -107,6 +169,7 @@ public class ProducerJSON {
             if (infoDatabaseSMS.getCount() == 0){
                 mainJsonObject.setSentsms(smsSent);
                 infoDatabaseSMS.close();
+                smsDatabase.close();
             }else {
                 while (infoDatabaseSMS.moveToNext()) {
                     String id,smsID,serverID = null;

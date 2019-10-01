@@ -16,6 +16,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
@@ -213,22 +214,46 @@ public class ForegroundService extends Service {
 
 
 
-                                /* Update GetSMS */
+                                /* Update GetSMS NEW*/
                                 if(!result.isNull("smsnewsaved")){
                                     JSONArray smsNewSaved = result.getJSONArray("smsnewsaved");
                                     for (int i = 0; i < smsNewSaved.length(); i++) {
-                                        String localID,smsID,ServerID = null;
+                                        String localID,smsID,md5,ServerID = null;
                                         JSONObject objectArray =  smsNewSaved.getJSONObject(i);
-                                        if (!objectArray.isNull("localid") ||
-                                                !objectArray.isNull("smsid")||
-                                                !objectArray.isNull("serverid"))
+                                        if (!objectArray.isNull("localid")  ||
+                                                !objectArray.isNull("smsid")    ||
+                                                !objectArray.isNull("serverid") ||
+                                                !objectArray.isNull("md5"))
                                         {
                                             localID = objectArray.getString("localid");
                                             smsID = objectArray.getString("smsid");
+                                            md5 = objectArray.getString("md5");
                                             ServerID = objectArray.getString("serverid");
 
-                                            item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,ServerID);
+                                            item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,md5,ServerID);
                                             Log.i(av.tag_GetSMS, "1- smsnewsaved : "+ localID+" | "+smsID+" | "+ServerID);
+                                            new Async_smsnewsaved(context).execute(param_smsnewsaved);
+                                        }
+                                    }
+                                }
+                                /* Update GetSMS LOST */
+                                if(!result.isNull("lostresult")){
+                                    JSONArray smsNewSaved = result.getJSONArray("lostresult");
+                                    for (int i = 0; i < smsNewSaved.length(); i++) {
+                                        String localID,smsID,md5,ServerID = null;
+                                        JSONObject objectArray =  smsNewSaved.getJSONObject(i);
+                                        if (!objectArray.isNull("localid")  ||
+                                            !objectArray.isNull("smsid")    ||
+                                            !objectArray.isNull("serverid") ||
+                                            !objectArray.isNull("md5"))
+                                        {
+                                            localID = objectArray.getString("localid");
+                                            smsID = objectArray.getString("smsid");
+                                            md5 = objectArray.getString("md5");
+                                            ServerID = objectArray.getString("serverid");
+
+                                            item_smsnewsaved param_smsnewsaved = new item_smsnewsaved(smsID,localID,md5,ServerID);
+                                            Log.i(av.tag_GetSMS, "1- lostresult : "+ localID+" | "+smsID+" | "+ServerID);
                                             new Async_smsnewsaved(context).execute(param_smsnewsaved);
                                         }
                                     }
@@ -334,7 +359,7 @@ public class ForegroundService extends Service {
                      body = textJsonDatabaseSMS.getBytes(StandardCharsets.UTF_8);
                      return body;
                 }
-            };
+            }; post_NewSMSSending.setRetryPolicy(new DefaultRetryPolicy(5 * 1000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
 
             post_NewSMSSending.setRetryPolicy(new RetryPolicy() {

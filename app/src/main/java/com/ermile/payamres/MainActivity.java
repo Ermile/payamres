@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout Refresh_json;
 
 
+
+
     private void setText(){
         txv_versionNumber = findViewById(R.id.txv_versionNumber);
         tv_numberphone = findViewById(R.id.tv_numberphone);
@@ -164,22 +166,24 @@ public class MainActivity extends AppCompatActivity {
         setText();
         CheckBox();
 
+
+
+
+
         smsPermission_isOK();
         /*First Open app*/
         String number = SaveManager.get(getApplicationContext()).get_Number().get(SaveManager.numberPhone);
-        boolean firstOpen = SaveManager.get(getApplicationContext()).get_Info().get(SaveManager.firstOpen);
-        if (number == null && !firstOpen){
+        Boolean firstOpen = SaveManager.get(getApplicationContext()).get_Info().get(SaveManager.firstOpen);
+        if (!firstOpen){
             SendSMS_Tester();
-            SAVE_NUMBER();
-        }else {
-            if (hasInternetConnection()){
-                setText();
-                startService();
-            }
         }
-
-
-
+        if (number == null){
+            SAVE_NUMBER();
+        }
+        if (hasInternetConnection()){
+            setText();
+            startService();
+        }
 
         /*Set Direction RTL*/
         Layout_ActivityMain = findViewById(R.id.Layout_ActivityMain);

@@ -28,9 +28,10 @@ public class Async_smsnewsaved extends AsyncTask<item_smsnewsaved, Void , Void> 
             try {
                 String Localid = p.getLocalid();
                 String Smsid = p.getSmsid();
+                String md5 = p.getMd5();
                 String Serverid = p.getServerid();
 
-                GetSMS_update.serverID(context, Localid, Smsid, Serverid);
+                GetSMS_update.serverID_NEW(context, Localid, Smsid,md5, Serverid);
                 Log.d(av.tag_GetSMS, "Async_smsnewsaved (doInBackground): "+ Localid + " | " + Smsid+ " | " + Serverid );
 
             } catch (Exception error) {

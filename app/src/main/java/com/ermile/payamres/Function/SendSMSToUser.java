@@ -29,7 +29,7 @@ public class SendSMSToUser extends AsyncTask<String, Void , Void> {
     @Override
     protected Void doInBackground(String... params) {
         for (String p : params) {
-            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+            SQLiteDatabase smsDatabase = new DatabaseSMS(context).getReadableDatabase();
             String query =  "SELECT * FROM "+DatabaseSMS.table_SendSMS
                     + " WHERE "+DatabaseSMS.sendSMS_isSendToUser+ " = 'false' limit 10 ";
             Cursor getSendSMS = smsDatabase.rawQuery(query, null);
@@ -61,6 +61,8 @@ public class SendSMSToUser extends AsyncTask<String, Void , Void> {
                 }
 
             }
+            getSendSMS.close();
+            smsDatabase.close();
         }
         return null;
     }

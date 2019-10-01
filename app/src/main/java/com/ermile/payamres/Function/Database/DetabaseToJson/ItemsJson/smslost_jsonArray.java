@@ -1,11 +1,10 @@
 package com.ermile.payamres.Function.Database.DetabaseToJson.ItemsJson;
 
-public class smsnew_jsonArray {
-
+public class smslost_jsonArray {
     String localid,from,text,date,smsid,userdata,MD5;
     String brand,model,simcartSerial;
 
-    public smsnew_jsonArray(String localid, String from, String text, String date, String smsid, String userdata, String MD5, String brand, String model, String simcartSerial) {
+    public smslost_jsonArray(String localid, String from, String text, String date, String smsid, String userdata, String MD5, String brand, String model, String simcartSerial) {
         this.localid = localid;
         this.from = from;
         this.text = text;

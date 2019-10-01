@@ -11,7 +11,7 @@ import com.ermile.payamres.Static.av;
 public class SendSMS_Select {
 
     public static boolean getServerID(Context context,String ServerID){
-        SQLiteDatabase smsDatabase = new DatabaseSMS(context).getWritableDatabase();
+        SQLiteDatabase smsDatabase = new DatabaseSMS(context).getReadableDatabase();
         Cursor getID = smsDatabase.rawQuery(
                 " SELECT "+DatabaseSMS.sendSMS_serverID
                         +" FROM "+DatabaseSMS.table_SendSMS
